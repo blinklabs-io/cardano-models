@@ -14,14 +14,106 @@
 
 package models
 
+import (
+	"github.com/blinklabs-io/gouroboros/cbor"
+)
+
 // TunaV1State represents the datum format used by the $TUNA mining smart contract (v1)
 type TunaV1State struct {
+	// This allows the type to be used with cbor.DecodeGeneric
+	cbor.StructAsArray
 	BlockNumber      int64
-	TargetHash       []byte
+	CurrentHash      []byte
 	LeadingZeros     int64
 	DifficultyNumber int64
 	EpochTime        int64
 	RealTimeNow      int64
-	Message          []byte
+	Extra            any
 	Interlink        [][]byte
+}
+
+func (t *TunaV1State) MarshalCBOR() ([]byte, error) {
+	var tmpInterlink []any
+	for _, item := range t.Interlink {
+		tmpInterlink = append(tmpInterlink, item)
+	}
+	tmp := cbor.NewConstructor(
+		0,
+		cbor.IndefLengthList{
+			Items: []any{
+				t.BlockNumber,
+				t.CurrentHash,
+				t.LeadingZeros,
+				t.DifficultyNumber,
+				t.EpochTime,
+				t.RealTimeNow,
+				t.Extra,
+				cbor.IndefLengthList{
+					Items: tmpInterlink,
+				},
+			},
+		},
+	)
+	return cbor.Encode(&tmp)
+}
+
+func (t *TunaV1State) UnmarshalCBOR(cborData []byte) error {
+	var tmpConstr cbor.Constructor
+	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
+		return err
+	}
+	return cbor.DecodeGeneric(
+		tmpConstr.FieldsCbor(),
+		t,
+	)
+}
+
+// TunaV2State represents the datum format used by the $TUNA mining smart contract (v2)
+type TunaV2State struct {
+	// This allows the type to be used with cbor.DecodeGeneric
+	cbor.StructAsArray
+	BlockNumber      int64
+	CurrentHash      []byte
+	LeadingZeros     int64
+	DifficultyNumber int64
+	EpochTime        int64
+	RealTimeNow      int64
+	Interlink        [][]byte
+	Extra            any
+}
+
+func (t *TunaV2State) MarshalCBOR() ([]byte, error) {
+	var tmpInterlink []any
+	for _, item := range t.Interlink {
+		tmpInterlink = append(tmpInterlink, item)
+	}
+	tmp := cbor.NewConstructor(
+		0,
+		cbor.IndefLengthList{
+			Items: []any{
+				t.BlockNumber,
+				t.CurrentHash,
+				t.LeadingZeros,
+				t.DifficultyNumber,
+				t.EpochTime,
+				t.RealTimeNow,
+				cbor.IndefLengthList{
+					Items: tmpInterlink,
+				},
+				t.Extra,
+			},
+		},
+	)
+	return cbor.Encode(&tmp)
+}
+
+func (t *TunaV2State) UnmarshalCBOR(cborData []byte) error {
+	var tmpConstr cbor.Constructor
+	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
+		return err
+	}
+	return cbor.DecodeGeneric(
+		tmpConstr.FieldsCbor(),
+		t,
+	)
 }
