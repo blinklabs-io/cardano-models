@@ -2,7 +2,7 @@ module github.com/blinklabs-io/cardano-models
 
 go 1.20
 
-require github.com/blinklabs-io/gouroboros v0.64.0
+require github.com/blinklabs-io/gouroboros v0.66.0
 
 require (
 	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
