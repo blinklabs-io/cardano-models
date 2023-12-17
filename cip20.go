@@ -14,10 +14,29 @@
 
 package models
 
+import "github.com/go-playground/validator/v10"
+
 type Cip20Metadata struct {
-	Num674 Num674 `cbor:"674,keyasint" json:"674"`
+	Num674 Num674 `cbor:"674,keyasint" json:"674" validate:"required"`
 }
 
 type Num674 struct {
-	Msg []string `cbor:"msg" json:"msg"`
+	Msg []string `cbor:"msg" json:"msg" validate:"required,gt=0,dive,max=64"`
+}
+
+func NewCip20Metadata(messages []string) (*Cip20Metadata, error) {
+	validate := validator.New()
+
+	metadata := &Cip20Metadata{Num674: Num674{Msg: messages}}
+
+	if err := validate.Struct(metadata); err != nil {
+		return nil, err
+	}
+
+	return metadata, nil
+}
+
+func (c *Cip20Metadata) Validate() error {
+	validate := validator.New()
+	return validate.Struct(c)
 }
