@@ -20,10 +20,12 @@ import (
 	"github.com/blinklabs-io/gouroboros/cbor"
 )
 
+type CardanoDnsTtl uint
+
 type CardanoDnsDomain struct {
 	Origin         []byte
 	Records        []CardanoDnsDomainRecord
-	AdditionalData any
+	AdditionalData CardanoDnsMaybe[any]
 }
 
 func (c CardanoDnsDomain) String() string {
@@ -52,53 +54,79 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 		return fmt.Errorf("unexpected constructor index: %d", tmpData.Constructor())
 	}
 	tmpFields := tmpData.Fields()
-	switch len(tmpFields) {
-	case 2, 3:
-		c.Origin = tmpFields[0].(cbor.ByteString).Bytes()
-		for _, record := range tmpFields[1].([]any) {
-			recordConstr := record.(cbor.Constructor)
-			recordFields := recordConstr.Fields()
-			if recordConstr.Constructor() != 1 {
-				return fmt.Errorf("unexpected constructor index: %d", recordConstr.Constructor())
-			}
-			var tmpRecord CardanoDnsDomainRecord
-			switch len(recordFields) {
-			case 3:
-				tmpRecord.Lhs = recordFields[0].(cbor.ByteString).Bytes()
-				tmpRecord.Type = recordFields[1].(cbor.ByteString).Bytes()
-				tmpRecord.Rhs = recordFields[2].(cbor.ByteString).Bytes()
-			case 4:
-				tmpRecord.Lhs = recordFields[0].(cbor.ByteString).Bytes()
-				tmpRecord.Ttl = uint(recordFields[1].(uint64))
-				tmpRecord.Type = recordFields[2].(cbor.ByteString).Bytes()
-				tmpRecord.Rhs = recordFields[3].(cbor.ByteString).Bytes()
-			default:
-				return fmt.Errorf("unexpected constructor field length: %d", len(recordFields))
-			}
-			c.Records = append(c.Records, tmpRecord)
+	c.Origin = tmpFields[0].(cbor.ByteString).Bytes()
+	for _, record := range tmpFields[1].([]any) {
+		recordConstr := record.(cbor.Constructor)
+		var tmpRecord CardanoDnsDomainRecord
+		if _, err := cbor.Decode(recordConstr.Cbor(), &tmpRecord); err != nil {
+			return err
 		}
-		if len(tmpData.Fields()) == 3 {
-			c.AdditionalData = tmpData.Fields()[2]
-		}
-	default:
-		return fmt.Errorf("unexpected constructor field length: %d", len(tmpData.Fields()))
+		c.Records = append(c.Records, tmpRecord)
 	}
 	return nil
 }
 
 type CardanoDnsDomainRecord struct {
+	// This allows the type to be used with cbor.DecodeGeneric
+	cbor.StructAsArray
 	Lhs  []byte
-	Ttl  uint
+	Ttl  CardanoDnsMaybe[CardanoDnsTtl]
 	Type []byte
 	Rhs  []byte
+}
+
+func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
+	var tmpConstr cbor.Constructor
+	if _, err := cbor.Decode(data, &tmpConstr); err != nil {
+		return err
+	}
+	if tmpConstr.Constructor() != 1 {
+		return fmt.Errorf("unexpected constructor index: %d", tmpConstr.Constructor())
+	}
+	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
 }
 
 func (c CardanoDnsDomainRecord) String() string {
 	return fmt.Sprintf(
 		"CardanoDnsDomainRecord { Lhs = %s, Ttl = %d, Type = %s, Rhs = %s }",
 		c.Lhs,
-		c.Ttl,
+		c.Ttl.Value,
 		c.Type,
 		c.Rhs,
 	)
+}
+
+type CardanoDnsMaybe[T any] struct {
+	// This allows the type to be used with cbor.DecodeGeneric
+	cbor.StructAsArray
+	Value    T
+	hasValue bool
+}
+
+func NewCardanoDnsMaybe[T any](v any) CardanoDnsMaybe[T] {
+	if v == nil {
+		return CardanoDnsMaybe[T]{}
+	}
+	return CardanoDnsMaybe[T]{
+		Value:    v.(T),
+		hasValue: true,
+	}
+}
+
+func (c CardanoDnsMaybe[T]) HasValue() bool {
+	return c.hasValue
+}
+
+func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
+	var tmpConstr cbor.Constructor
+	if _, err := cbor.Decode(data, &tmpConstr); err != nil {
+		return err
+	}
+	if tmpConstr.Constructor() == 0 {
+		if err := cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c); err != nil {
+			return err
+		}
+		c.hasValue = true
+	}
+	return nil
 }

@@ -29,30 +29,53 @@ var cardanoDnsTestDefs = []struct {
 	expectedObj models.CardanoDnsDomain
 }{
 	{
-		cborHex: "d87a9f4b666f6f2e63617264616e6f9fd87a9f4b666f6f2e63617264616e6f426e734f6e73312e666f6f2e63617264616e6fffd87a9f4b666f6f2e63617264616e6f426e734f6e73322e666f6f2e63617264616e6fffd87a9f4f6e73312e666f6f2e63617264616e6f41614a3137322e32382e302e32ffd87a9f4f6e73322e666f6f2e63617264616e6f187b416147312e322e332e34ffffff",
+		cborHex: "d87a9f4776696c6c6167659fd87a9f4f76696c6c6167652e63617264616e6fd8799f190e10ff41414a3137322e32382e302e32ffd87a9f4f76696c6c6167652e63617264616e6fd8799f197080ff426e73536e73312e76696c6c6167652e63617264616e6fffffd87a80ff",
 		expectedObj: models.CardanoDnsDomain{
-			Origin: []byte("foo.cardano"),
+			Origin: []byte("village"),
 			Records: []models.CardanoDnsDomainRecord{
 				{
-					Lhs:  []byte("foo.cardano"),
-					Type: []byte("ns"),
-					Rhs:  []byte("ns1.foo.cardano"),
-				},
-				{
-					Lhs:  []byte("foo.cardano"),
-					Type: []byte("ns"),
-					Rhs:  []byte("ns2.foo.cardano"),
-				},
-				{
-					Lhs:  []byte("ns1.foo.cardano"),
-					Type: []byte("a"),
+					Lhs:  []byte("village.cardano"),
+					Type: []byte("A"),
 					Rhs:  []byte("172.28.0.2"),
+					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(3600)),
 				},
 				{
-					Lhs:  []byte("ns2.foo.cardano"),
-					Ttl:  123,
-					Type: []byte("a"),
-					Rhs:  []byte("1.2.3.4"),
+					Lhs:  []byte("village.cardano"),
+					Type: []byte("ns"),
+					Rhs:  []byte("ns1.village.cardano"),
+					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(28800)),
+				},
+			},
+		},
+	},
+	{
+		cborHex: "d87a9f47656e636c6176659fd87a9f4f656e636c6176652e63617264616e6fd8799f190e10ff41414f3430312e3430312e3430312e343031ffd87a9f4f656e636c6176652e63617264616e6fd8799f197080ff426e73536e73312e656e636c6176652e63617264616e6fffd87a9f4f656e636c6176652e63617264616e6fd8799f190e10ff41414a3137322e32382e302e32ffd87a9f4f656e636c6176652e63617264616e6fd87a80426e73536e73322e656e636c6176652e63617264616e6fffffd87a80ff",
+		expectedObj: models.CardanoDnsDomain{
+			Origin: []byte("enclave"),
+			Records: []models.CardanoDnsDomainRecord{
+				{
+					Lhs:  []byte("enclave.cardano"),
+					Type: []byte("A"),
+					Rhs:  []byte("401.401.401.401"),
+					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(3600)),
+				},
+				{
+					Lhs:  []byte("enclave.cardano"),
+					Type: []byte("ns"),
+					Rhs:  []byte("ns1.enclave.cardano"),
+					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(28800)),
+				},
+				{
+					Lhs:  []byte("enclave.cardano"),
+					Type: []byte("A"),
+					Rhs:  []byte("172.28.0.2"),
+					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(3600)),
+				},
+				{
+					Lhs:  []byte("enclave.cardano"),
+					Type: []byte("ns"),
+					Rhs:  []byte("ns2.enclave.cardano"),
+					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](nil),
 				},
 			},
 		},
