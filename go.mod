@@ -3,7 +3,7 @@ module github.com/blinklabs-io/cardano-models
 go 1.20
 
 require (
-	github.com/blinklabs-io/gouroboros v0.71.0
+	github.com/blinklabs-io/gouroboros v0.72.0
 	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/go-playground/validator/v10 v10.19.0
 )
