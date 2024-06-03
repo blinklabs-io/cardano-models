@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/blinklabs-io/gouroboros v0.85.0
 	github.com/fxamacker/cbor/v2 v2.6.0
-	github.com/go-playground/validator/v10 v10.20.0
+	github.com/go-playground/validator/v10 v10.21.0
 )
 
 require (
