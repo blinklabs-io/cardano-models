@@ -73,16 +73,11 @@ type TunaV2State struct {
 	LeadingZeros     int64
 	DifficultyNumber int64
 	EpochTime        int64
-	RealTimeNow      int64
-	Interlink        [][]byte
-	Extra            any
+	CurrentPosixTime int64
+	MerkleRoot       []byte
 }
 
 func (t *TunaV2State) MarshalCBOR() ([]byte, error) {
-	var tmpInterlink []any
-	for _, item := range t.Interlink {
-		tmpInterlink = append(tmpInterlink, item)
-	}
 	tmp := cbor.NewConstructor(
 		0,
 		cbor.IndefLengthList{
@@ -91,9 +86,8 @@ func (t *TunaV2State) MarshalCBOR() ([]byte, error) {
 			t.LeadingZeros,
 			t.DifficultyNumber,
 			t.EpochTime,
-			t.RealTimeNow,
-			cbor.IndefLengthList(tmpInterlink),
-			t.Extra,
+			t.CurrentPosixTime,
+			t.MerkleRoot,
 		},
 	)
 	return cbor.Encode(&tmp)
