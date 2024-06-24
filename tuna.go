@@ -40,18 +40,14 @@ func (t *TunaV1State) MarshalCBOR() ([]byte, error) {
 	tmp := cbor.NewConstructor(
 		0,
 		cbor.IndefLengthList{
-			Items: []any{
-				t.BlockNumber,
-				t.CurrentHash,
-				t.LeadingZeros,
-				t.DifficultyNumber,
-				t.EpochTime,
-				t.RealTimeNow,
-				t.Extra,
-				cbor.IndefLengthList{
-					Items: tmpInterlink,
-				},
-			},
+			t.BlockNumber,
+			t.CurrentHash,
+			t.LeadingZeros,
+			t.DifficultyNumber,
+			t.EpochTime,
+			t.RealTimeNow,
+			t.Extra,
+			cbor.IndefLengthList(tmpInterlink),
 		},
 	)
 	return cbor.Encode(&tmp)
@@ -90,18 +86,14 @@ func (t *TunaV2State) MarshalCBOR() ([]byte, error) {
 	tmp := cbor.NewConstructor(
 		0,
 		cbor.IndefLengthList{
-			Items: []any{
-				t.BlockNumber,
-				t.CurrentHash,
-				t.LeadingZeros,
-				t.DifficultyNumber,
-				t.EpochTime,
-				t.RealTimeNow,
-				cbor.IndefLengthList{
-					Items: tmpInterlink,
-				},
-				t.Extra,
-			},
+			t.BlockNumber,
+			t.CurrentHash,
+			t.LeadingZeros,
+			t.DifficultyNumber,
+			t.EpochTime,
+			t.RealTimeNow,
+			cbor.IndefLengthList(tmpInterlink),
+			t.Extra,
 		},
 	)
 	return cbor.Encode(&tmp)
