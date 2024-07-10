@@ -23,6 +23,8 @@ import (
 type CardanoDnsTtl uint
 
 type CardanoDnsDomain struct {
+	// This allows the type to be used with cbor.DecodeGeneric
+	cbor.StructAsArray
 	Origin         []byte
 	Records        []CardanoDnsDomainRecord
 	AdditionalData CardanoDnsMaybe[any]
@@ -53,17 +55,7 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 	if tmpData.Constructor() != 1 {
 		return fmt.Errorf("unexpected constructor index: %d", tmpData.Constructor())
 	}
-	tmpFields := tmpData.Fields()
-	c.Origin = tmpFields[0].(cbor.ByteString).Bytes()
-	for _, record := range tmpFields[1].([]any) {
-		recordConstr := record.(cbor.Constructor)
-		var tmpRecord CardanoDnsDomainRecord
-		if _, err := cbor.Decode(recordConstr.Cbor(), &tmpRecord); err != nil {
-			return err
-		}
-		c.Records = append(c.Records, tmpRecord)
-	}
-	return nil
+	return cbor.DecodeGeneric(tmpData.FieldsCbor(), c)
 }
 
 type CardanoDnsDomainRecord struct {
