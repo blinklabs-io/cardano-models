@@ -7,7 +7,7 @@ toolchain go1.22.8
 require (
 	github.com/blinklabs-io/gouroboros v0.103.6
 	github.com/fxamacker/cbor/v2 v2.7.0
-	github.com/go-playground/validator/v10 v10.22.1
+	github.com/go-playground/validator/v10 v10.23.0
 )
 
 require (
