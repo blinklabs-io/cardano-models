@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.8
 
 require (
-	github.com/blinklabs-io/gouroboros v0.105.1
+	github.com/blinklabs-io/gouroboros v0.105.2
 	github.com/fxamacker/cbor/v2 v2.7.0
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/stretchr/testify v1.10.0
