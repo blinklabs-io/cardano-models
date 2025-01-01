@@ -1,8 +1,6 @@
 module github.com/blinklabs-io/cardano-models
 
-go 1.22
-
-toolchain go1.22.8
+go 1.22.9
 
 require (
 	github.com/blinklabs-io/gouroboros v0.106.0
