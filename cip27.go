@@ -119,7 +119,7 @@ func (af *AddrField) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	var arr []string
+	arr := []string{}
 	if err := json.Unmarshal(data, &arr); err == nil {
 		af.Addresses = arr
 		return nil
