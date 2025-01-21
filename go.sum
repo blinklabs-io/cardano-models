@@ -1,5 +1,5 @@
-github.com/blinklabs-io/gouroboros v0.107.1 h1:BOHByzGwkGCrAkXAxaH3hPiXOPPxyYV1WrB7crJEaUE=
-github.com/blinklabs-io/gouroboros v0.107.1/go.mod h1:Igd/hQ3pIhX3/KRM5js3Jz6CF8M8oKN9aO9d9NR7wGo=
+github.com/blinklabs-io/gouroboros v0.108.0 h1:ys4A3Mnnr7pZTWjUYGkkVolNKBVUOIqm9bz8DEcUA9c=
+github.com/blinklabs-io/gouroboros v0.108.0/go.mod h1:10k4zsSu1Xykvh+J2Vfdz49ul1kfNH+zlnuCmlBcop4=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fxamacker/cbor/v2 v2.7.0 h1:iM5WgngdRBanHcxugY4JySA0nk1wZorNOpTgCMedv5E=
