@@ -24,11 +24,11 @@ import (
 
 // Cip27Metadata is the top-level container for royalties data under the "777" tag.
 type Cip27Metadata struct {
-	Num777 Cip777 `cbor:"777,keyasint" json:"777" validate:"required"`
+	Num777 Num777 `cbor:"777,keyasint" json:"777" validate:"required"`
 }
 
-// Cip777 represents the actual royalty info. It handles both modern "rate" and legacy "pct."
-type Cip777 struct {
+// Num777 represents the actual royalty info. It handles both modern "rate" and legacy "pct."
+type Num777 struct {
 	// Internally, Rate is our main numeric string (e.g., "0.20").
 	Rate string `json:"-"`
 
@@ -67,7 +67,7 @@ func (c *Cip27Metadata) UnmarshalJSON(data []byte) error {
 }
 
 // UnmarshalJSON checks which field ("rate" or "pct") is present, giving precedence to "rate."
-func (c *Cip777) UnmarshalJSON(data []byte) error {
+func (c *Num777) UnmarshalJSON(data []byte) error {
 	// Temporary structure for decoding both fields plus 'addr.'
 	var raw struct {
 		Pct  *string   `json:"pct"`
@@ -95,7 +95,7 @@ func (c *Cip777) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON outputs "rate" as our canonical field.
-func (c Cip777) MarshalJSON() ([]byte, error) {
+func (c Num777) MarshalJSON() ([]byte, error) {
 	// We only expose "rate" in the final JSON.
 	var out struct {
 		Rate string    `json:"rate"`
@@ -139,7 +139,7 @@ func (af AddrField) MarshalJSON() ([]byte, error) {
 // NewCip27Metadata creates a new CIP-027 metadata object with the given rate and addresses.
 func NewCip27Metadata(rate string, addresses []string) (*Cip27Metadata, error) {
 	meta := &Cip27Metadata{
-		Num777: Cip777{
+		Num777: Num777{
 			Rate: rate,
 			Addr: AddrField{Addresses: addresses},
 		},
