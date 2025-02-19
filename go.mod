@@ -5,7 +5,7 @@ go 1.22.11
 require (
 	github.com/blinklabs-io/gouroboros v0.108.2
 	github.com/fxamacker/cbor/v2 v2.7.0
-	github.com/go-playground/validator/v10 v10.24.0
+	github.com/go-playground/validator/v10 v10.25.0
 	github.com/stretchr/testify v1.10.0
 )
 
