@@ -33,7 +33,7 @@ type TunaV1State struct {
 }
 
 func (t *TunaV1State) MarshalCBOR() ([]byte, error) {
-	var tmpInterlink []any
+	tmpInterlink := []any{}
 	for _, item := range t.Interlink {
 		tmpInterlink = append(tmpInterlink, item)
 	}
