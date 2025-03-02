@@ -30,7 +30,7 @@ type CardanoDnsDomain struct {
 	AdditionalData CardanoDnsMaybe[any]
 }
 
-func (c CardanoDnsDomain) String() string {
+func (c *CardanoDnsDomain) String() string {
 	ret := fmt.Sprintf(
 		"CardanoDnsDomain { Origin = %s, Records = [ ",
 		c.Origin,
@@ -78,7 +78,7 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
 }
 
-func (c CardanoDnsDomainRecord) String() string {
+func (c *CardanoDnsDomainRecord) String() string {
 	return fmt.Sprintf(
 		"CardanoDnsDomainRecord { Lhs = %s, Ttl = %d, Type = %s, Rhs = %s }",
 		c.Lhs,
