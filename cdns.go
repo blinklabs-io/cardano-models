@@ -53,7 +53,10 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 		return err
 	}
 	if tmpData.Constructor() != 1 {
-		return fmt.Errorf("unexpected constructor index: %d", tmpData.Constructor())
+		return fmt.Errorf(
+			"unexpected constructor index: %d",
+			tmpData.Constructor(),
+		)
 	}
 	return cbor.DecodeGeneric(tmpData.FieldsCbor(), c)
 }
@@ -73,7 +76,10 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 		return err
 	}
 	if tmpConstr.Constructor() != 1 {
-		return fmt.Errorf("unexpected constructor index: %d", tmpConstr.Constructor())
+		return fmt.Errorf(
+			"unexpected constructor index: %d",
+			tmpConstr.Constructor(),
+		)
 	}
 	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
 }

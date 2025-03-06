@@ -37,13 +37,17 @@ var cardanoDnsTestDefs = []struct {
 					Lhs:  []byte("village.cardano"),
 					Type: []byte("A"),
 					Rhs:  []byte("172.28.0.2"),
-					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(3600)),
+					Ttl: models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+						models.CardanoDnsTtl(3600),
+					),
 				},
 				{
 					Lhs:  []byte("village.cardano"),
 					Type: []byte("ns"),
 					Rhs:  []byte("ns1.village.cardano"),
-					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(28800)),
+					Ttl: models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+						models.CardanoDnsTtl(28800),
+					),
 				},
 			},
 		},
@@ -57,19 +61,25 @@ var cardanoDnsTestDefs = []struct {
 					Lhs:  []byte("enclave.cardano"),
 					Type: []byte("A"),
 					Rhs:  []byte("401.401.401.401"),
-					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(3600)),
+					Ttl: models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+						models.CardanoDnsTtl(3600),
+					),
 				},
 				{
 					Lhs:  []byte("enclave.cardano"),
 					Type: []byte("ns"),
 					Rhs:  []byte("ns1.enclave.cardano"),
-					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(28800)),
+					Ttl: models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+						models.CardanoDnsTtl(28800),
+					),
 				},
 				{
 					Lhs:  []byte("enclave.cardano"),
 					Type: []byte("A"),
 					Rhs:  []byte("172.28.0.2"),
-					Ttl:  models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(3600)),
+					Ttl: models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+						models.CardanoDnsTtl(3600),
+					),
 				},
 				{
 					Lhs:  []byte("enclave.cardano"),

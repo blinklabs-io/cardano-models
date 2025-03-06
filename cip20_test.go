@@ -28,7 +28,9 @@ func TestValidCip20Metadata(t *testing.T) {
 			name: "Valid - Single Message",
 			expectedObj: Cip20Metadata{
 				Num674: Num674{
-					Msg: []string{"This is a comment for the transaction xyz, thank you very much!"},
+					Msg: []string{
+						"This is a comment for the transaction xyz, thank you very much!",
+					},
 				},
 			},
 			cborHex: "A163363734A1636D736781783F54686973206973206120636F6D6D656E7420666F7220746865207472616E73616374696F6E2078797A2C207468616E6B20796F752076657279206D75636821",
@@ -80,7 +82,9 @@ func TestValidCip20Metadata(t *testing.T) {
 			name: "Invalid - Message Exceeds 64 Bytes",
 			expectedObj: Cip20Metadata{
 				Num674: Num674{
-					Msg: []string{strings.Repeat("a", 65)}, // 65 'a's to exceed the limit
+					Msg: []string{
+						strings.Repeat("a", 65),
+					}, // 65 'a's to exceed the limit
 				},
 			},
 			jsonData: `{
@@ -143,7 +147,11 @@ func TestValidCip20Metadata(t *testing.T) {
 			// Decode the CBOR hex string
 			cborData, err := hex.DecodeString(tc.cborHex)
 			if err != nil {
-				t.Errorf("failed to decode CBOR hex string for %s, error: %v", tc.name, err)
+				t.Errorf(
+					"failed to decode CBOR hex string for %s, error: %v",
+					tc.name,
+					err,
+				)
 			}
 
 			// CBOR Unmarshal
@@ -151,7 +159,10 @@ func TestValidCip20Metadata(t *testing.T) {
 			err = cbor.Unmarshal(cborData, &decodedMetadata)
 			if tc.expectCBORUnmarshalError {
 				if err == nil {
-					t.Errorf("expected CBOR unmarshal error but got none for test: %s", tc.name)
+					t.Errorf(
+						"expected CBOR unmarshal error but got none for test: %s",
+						tc.name,
+					)
 				}
 			} else {
 				if err != nil {
@@ -163,7 +174,10 @@ func TestValidCip20Metadata(t *testing.T) {
 			err = decodedMetadata.Validate()
 			if tc.expectValidationError {
 				if err == nil {
-					t.Errorf("expected validation error but got none for test: %s", tc.name)
+					t.Errorf(
+						"expected validation error but got none for test: %s",
+						tc.name,
+					)
 				}
 			} else {
 				if err != nil {
@@ -174,10 +188,18 @@ func TestValidCip20Metadata(t *testing.T) {
 			// Deep Equality Check for CBOR
 			deepEqual := reflect.DeepEqual(decodedMetadata, tc.expectedObj)
 			if tc.expectCBORDeepEqualError && deepEqual {
-				t.Errorf("Cbor expected deep equal error but objects are identical for test: %s", tc.name)
+				t.Errorf(
+					"Cbor expected deep equal error but objects are identical for test: %s",
+					tc.name,
+				)
 			}
 			if !tc.expectCBORDeepEqualError && !deepEqual {
-				t.Errorf("Cbor expected objects to be identical but they are not for test: %s, expected: %v, got: %v", tc.name, tc.expectedObj, decodedMetadata)
+				t.Errorf(
+					"Cbor expected objects to be identical but they are not for test: %s, expected: %v, got: %v",
+					tc.name,
+					tc.expectedObj,
+					decodedMetadata,
+				)
 			}
 
 			// Reset the object for JSON testing
@@ -185,11 +207,18 @@ func TestValidCip20Metadata(t *testing.T) {
 			// Decode the JSON string
 			err = json.Unmarshal([]byte(tc.jsonData), &decodedMetadata)
 			if err != nil {
-				t.Errorf("unexpected result unmarshaling JSON to Cip20Metadata for test %s, error: %v", tc.name, err)
+				t.Errorf(
+					"unexpected result unmarshaling JSON to Cip20Metadata for test %s, error: %v",
+					tc.name,
+					err,
+				)
 			}
 			if tc.expectJSONUnmarshalError {
 				if err == nil {
-					t.Errorf("expected JSON unmarshal error but got none for test: %s", tc.name)
+					t.Errorf(
+						"expected JSON unmarshal error but got none for test: %s",
+						tc.name,
+					)
 				}
 			} else {
 				if err != nil {
@@ -201,7 +230,10 @@ func TestValidCip20Metadata(t *testing.T) {
 			err = decodedMetadata.Validate()
 			if tc.expectValidationError {
 				if err == nil {
-					t.Errorf("expected validation error but got none for test: %s", tc.name)
+					t.Errorf(
+						"expected validation error but got none for test: %s",
+						tc.name,
+					)
 				}
 			} else {
 				if err != nil {
@@ -212,10 +244,18 @@ func TestValidCip20Metadata(t *testing.T) {
 			// Deep Equality Check for JSON
 			deepEqual = reflect.DeepEqual(decodedMetadata, tc.expectedObj)
 			if tc.expectJSONDeepEqualError && deepEqual {
-				t.Errorf("Json expected deep equal error but objects are identical for test: %s", tc.name)
+				t.Errorf(
+					"Json expected deep equal error but objects are identical for test: %s",
+					tc.name,
+				)
 			}
 			if !tc.expectJSONDeepEqualError && !deepEqual {
-				t.Errorf("Json expected objects to be identical but they are not for test: %s, expected: %v, got: %v", tc.name, tc.expectedObj, decodedMetadata)
+				t.Errorf(
+					"Json expected objects to be identical but they are not for test: %s, expected: %v, got: %v",
+					tc.name,
+					tc.expectedObj,
+					decodedMetadata,
+				)
 			}
 		})
 	}
@@ -238,7 +278,11 @@ func TestNewCip20Metadata(t *testing.T) {
 	}
 
 	if string(actualJSON) != expectedJSON {
-		t.Errorf("Expected JSON: %s, but got: %s", expectedJSON, string(actualJSON))
+		t.Errorf(
+			"Expected JSON: %s, but got: %s",
+			expectedJSON,
+			string(actualJSON),
+		)
 	}
 
 	// Test case: Invalid metadata
