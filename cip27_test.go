@@ -151,7 +151,11 @@ func TestUnmarshal_SingleAddressExample(t *testing.T) {
 
 	var meta Cip27Metadata
 	err := json.Unmarshal([]byte(input), &meta)
-	require.NoError(t, err, "Should unmarshal single address JSON without error")
+	require.NoError(
+		t,
+		err,
+		"Should unmarshal single address JSON without error",
+	)
 
 	// Check that 'rate' is "0.2" and that we have exactly one address in our slice
 	require.Equal(t, "0.2", meta.Num777.Rate)
@@ -175,7 +179,11 @@ func TestUnmarshal_ArrayAddressExample(t *testing.T) {
 
 	var meta Cip27Metadata
 	err := json.Unmarshal([]byte(input), &meta)
-	require.NoError(t, err, "Should unmarshal multiple address JSON without error")
+	require.NoError(
+		t,
+		err,
+		"Should unmarshal multiple address JSON without error",
+	)
 
 	// Check that 'rate' is "0.2" and that we have two addresses in our slice
 	require.Equal(t, "0.2", meta.Num777.Rate)
@@ -238,7 +246,11 @@ func TestUnmarshal_AddrAsObject(t *testing.T) {
   }`
 	var meta Cip27Metadata
 	err := json.Unmarshal([]byte(input), &meta)
-	require.Error(t, err, "Should fail because 'addr' must be string or array of strings")
+	require.Error(
+		t,
+		err,
+		"Should fail because 'addr' must be string or array of strings",
+	)
 }
 
 func TestUnmarshal_EmptyAddrArray(t *testing.T) {
@@ -265,7 +277,11 @@ func TestUnmarshal_BothPctAndRate_RateEmpty(t *testing.T) {
   }`
 	var meta Cip27Metadata
 	err := json.Unmarshal([]byte(input), &meta)
-	require.Error(t, err, "Empty rate should fail even if pct is valid, because rate takes precedence")
+	require.Error(
+		t,
+		err,
+		"Empty rate should fail even if pct is valid, because rate takes precedence",
+	)
 }
 
 func TestCip27Metadata_MarshalJSON(t *testing.T) {
@@ -274,18 +290,31 @@ func TestCip27Metadata_MarshalJSON(t *testing.T) {
 	require.NoError(t, err, "Should create CIP-27 metadata without error")
 
 	data, err := json.Marshal(meta)
-	require.NoError(t, err, "Should marshal CIP-27 metadata to JSON without error")
+	require.NoError(
+		t,
+		err,
+		"Should marshal CIP-27 metadata to JSON without error",
+	)
 
 	// Check that the resulting JSON contains expected fields/values.
 	var result map[string]interface{}
-	require.NoError(t, json.Unmarshal(data, &result), "Should unmarshal JSON back into map")
+	require.NoError(
+		t,
+		json.Unmarshal(data, &result),
+		"Should unmarshal JSON back into map",
+	)
 
 	// Expect top-level key "777"
 	topLevel, ok := result["777"].(map[string]interface{})
 	require.True(t, ok, "Should have a '777' key in marshaled JSON")
 
 	// Ensure "rate" is "0.25"
-	require.Equal(t, "0.25", topLevel["rate"], "Rate should match the input string")
+	require.Equal(
+		t,
+		"0.25",
+		topLevel["rate"],
+		"Rate should match the input string",
+	)
 
 	// Since addresses can be single string or an array,
 	// we expect them as an array (2 addresses).
