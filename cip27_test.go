@@ -297,7 +297,7 @@ func TestCip27Metadata_MarshalJSON(t *testing.T) {
 	)
 
 	// Check that the resulting JSON contains expected fields/values.
-	var result map[string]interface{}
+	var result map[string]any
 	require.NoError(
 		t,
 		json.Unmarshal(data, &result),
@@ -305,7 +305,7 @@ func TestCip27Metadata_MarshalJSON(t *testing.T) {
 	)
 
 	// Expect top-level key "777"
-	topLevel, ok := result["777"].(map[string]interface{})
+	topLevel, ok := result["777"].(map[string]any)
 	require.True(t, ok, "Should have a '777' key in marshaled JSON")
 
 	// Ensure "rate" is "0.25"
@@ -318,7 +318,7 @@ func TestCip27Metadata_MarshalJSON(t *testing.T) {
 
 	// Since addresses can be single string or an array,
 	// we expect them as an array (2 addresses).
-	addrs, ok := topLevel["addr"].([]interface{})
+	addrs, ok := topLevel["addr"].([]any)
 	require.True(t, ok, "Should have an array of addresses")
 	require.Len(t, addrs, 2, "Should have exactly 2 addresses")
 	require.Equal(t, "addr1xy...", addrs[0])
