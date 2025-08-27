@@ -8,7 +8,7 @@ require (
 	github.com/blinklabs-io/gouroboros v0.132.0
 	github.com/fxamacker/cbor/v2 v2.9.0
 	github.com/go-playground/validator/v10 v10.27.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
