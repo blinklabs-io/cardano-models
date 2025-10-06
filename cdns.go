@@ -62,7 +62,7 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 	return cbor.DecodeGeneric(tmpData.FieldsCbor(), c)
 }
 
-func (c CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
+func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
 	fields, err := cbor.EncodeGeneric(&struct {
 		cbor.StructAsArray
 		Origin         []byte
@@ -102,7 +102,7 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
 }
 
-func (r CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
+func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
 	fields, err := cbor.EncodeGeneric(&struct {
 		cbor.StructAsArray
 		Lhs  []byte
@@ -166,7 +166,7 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 	return nil
 }
 
-func (m CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
+func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
 	if !m.HasValue() {
 		// None: constructor(1) with empty array
 		emptyArr, err := cbor.EncodeGeneric(&struct{ cbor.StructAsArray }{})
