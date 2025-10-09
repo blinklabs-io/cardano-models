@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/blinklabs-io/gouroboros/cbor"
-	fcbor "github.com/fxamacker/cbor/v2"
 )
 
 type CardanoDnsTtl uint
@@ -76,7 +75,7 @@ func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cbor.Encode(cbor.NewConstructor(1, fcbor.RawMessage(fields)))
+	return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(fields)))
 }
 
 type CardanoDnsDomainRecord struct {
@@ -118,7 +117,7 @@ func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cbor.Encode(cbor.NewConstructor(1, fcbor.RawMessage(fields)))
+	return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(fields)))
 }
 
 func (c *CardanoDnsDomainRecord) String() string {
@@ -173,7 +172,7 @@ func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		return cbor.Encode(cbor.NewConstructor(1, fcbor.RawMessage(emptyArr)))
+		return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(emptyArr)))
 	}
 
 	// Some(Value): constructor(0) with single-field array
@@ -186,5 +185,5 @@ func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cbor.Encode(cbor.NewConstructor(0, fcbor.RawMessage(fields)))
+	return cbor.Encode(cbor.NewConstructor(0, cbor.RawMessage(fields)))
 }
