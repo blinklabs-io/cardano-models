@@ -61,6 +61,23 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 	return cbor.DecodeGeneric(tmpData.FieldsCbor(), c)
 }
 
+func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
+	fields, err := cbor.EncodeGeneric(&struct {
+		cbor.StructAsArray
+		Origin         []byte
+		Records        []CardanoDnsDomainRecord
+		AdditionalData CardanoDnsMaybe[any]
+	}{
+		Origin:         c.Origin,
+		Records:        c.Records,
+		AdditionalData: c.AdditionalData,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(fields)))
+}
+
 type CardanoDnsDomainRecord struct {
 	// This allows the type to be used with cbor.DecodeGeneric
 	cbor.StructAsArray
@@ -82,6 +99,25 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 		)
 	}
 	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
+}
+
+func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
+	fields, err := cbor.EncodeGeneric(&struct {
+		cbor.StructAsArray
+		Lhs  []byte
+		Ttl  CardanoDnsMaybe[CardanoDnsTtl]
+		Type []byte
+		Rhs  []byte
+	}{
+		Lhs:  r.Lhs,
+		Ttl:  r.Ttl,
+		Type: r.Type,
+		Rhs:  r.Rhs,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(fields)))
 }
 
 func (c *CardanoDnsDomainRecord) String() string {
@@ -127,4 +163,27 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 		c.hasValue = true
 	}
 	return nil
+}
+
+func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
+	if !m.HasValue() {
+		// None: constructor(1) with empty array
+		emptyArr, err := cbor.EncodeGeneric(&struct{ cbor.StructAsArray }{})
+		if err != nil {
+			return nil, err
+		}
+		return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(emptyArr)))
+	}
+
+	// Some(Value): constructor(0) with single-field array
+	fields, err := cbor.EncodeGeneric(&struct {
+		cbor.StructAsArray
+		Value T
+	}{
+		Value: m.Value,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cbor.Encode(cbor.NewConstructor(0, cbor.RawMessage(fields)))
 }
