@@ -62,20 +62,15 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 }
 
 func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
-	fields, err := cbor.EncodeGeneric(&struct {
-		cbor.StructAsArray
-		Origin         []byte
-		Records        []CardanoDnsDomainRecord
-		AdditionalData CardanoDnsMaybe[any]
-	}{
-		Origin:         c.Origin,
-		Records:        c.Records,
-		AdditionalData: c.AdditionalData,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(fields)))
+	tmp := cbor.NewConstructor(
+		1,
+		[]any{
+			c.Origin,
+			c.Records,
+			c.AdditionalData,
+		},
+	)
+	return cbor.Encode(tmp)
 }
 
 type CardanoDnsDomainRecord struct {
@@ -102,22 +97,16 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 }
 
 func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
-	fields, err := cbor.EncodeGeneric(&struct {
-		cbor.StructAsArray
-		Lhs  []byte
-		Ttl  CardanoDnsMaybe[CardanoDnsTtl]
-		Type []byte
-		Rhs  []byte
-	}{
-		Lhs:  r.Lhs,
-		Ttl:  r.Ttl,
-		Type: r.Type,
-		Rhs:  r.Rhs,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(fields)))
+	tmp := cbor.NewConstructor(
+		1,
+		[]any{
+			r.Lhs,
+			r.Ttl,
+			r.Type,
+			r.Rhs,
+		},
+	)
+	return cbor.Encode(tmp)
 }
 
 func (c *CardanoDnsDomainRecord) String() string {
@@ -167,23 +156,10 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 
 func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
 	if !m.HasValue() {
-		// None: constructor(1) with empty array
-		emptyArr, err := cbor.EncodeGeneric(&struct{ cbor.StructAsArray }{})
-		if err != nil {
-			return nil, err
-		}
-		return cbor.Encode(cbor.NewConstructor(1, cbor.RawMessage(emptyArr)))
+		// None: constructor(1) with empty field array
+		return cbor.Encode(cbor.NewConstructor(1, []any{}))
 	}
-
 	// Some(Value): constructor(0) with single-field array
-	fields, err := cbor.EncodeGeneric(&struct {
-		cbor.StructAsArray
-		Value T
-	}{
-		Value: m.Value,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return cbor.Encode(cbor.NewConstructor(0, cbor.RawMessage(fields)))
+	return cbor.Encode(cbor.NewConstructor(0, []any{m.Value}))
+	//return cbor.Encode(cbor.NewConstructor(0, cbor.RawMessage(fields)))
 }
