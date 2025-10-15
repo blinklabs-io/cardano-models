@@ -61,6 +61,18 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 	return cbor.DecodeGeneric(tmpData.FieldsCbor(), c)
 }
 
+func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
+	tmpData := cbor.NewConstructor(
+		1,
+		[]any{
+			c.Origin,
+			c.Records,
+			c.AdditionalData,
+		},
+	)
+	return cbor.Encode(tmpData)
+}
+
 type CardanoDnsDomainRecord struct {
 	// This allows the type to be used with cbor.DecodeGeneric
 	cbor.StructAsArray
@@ -82,6 +94,19 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 		)
 	}
 	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
+}
+
+func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
+	tmpData := cbor.NewConstructor(
+		1,
+		[]any{
+			r.Lhs,
+			r.Ttl,
+			r.Type,
+			r.Rhs,
+		},
+	)
+	return cbor.Encode(tmpData)
 }
 
 func (c *CardanoDnsDomainRecord) String() string {
@@ -127,4 +152,13 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 		c.hasValue = true
 	}
 	return nil
+}
+
+func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
+	if !m.HasValue() {
+		// None: constructor(1) with empty field array
+		return cbor.Encode(cbor.NewConstructor(1, []any{}))
+	}
+	// Some(Value): constructor(0) with single-field array
+	return cbor.Encode(cbor.NewConstructor(0, []any{m.Value}))
 }
