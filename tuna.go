@@ -20,7 +20,7 @@ import (
 
 // TunaV1State represents the datum format used by the $TUNA mining smart contract (v1)
 type TunaV1State struct {
-	// This allows the type to be used with cbor.DecodeGeneric
+	// This allows the type to be reused during decoding
 	cbor.StructAsArray
 	BlockNumber      int64
 	CurrentHash      []byte
@@ -58,15 +58,18 @@ func (t *TunaV1State) UnmarshalCBOR(cborData []byte) error {
 	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
 		return err
 	}
-	return cbor.DecodeGeneric(
-		tmpConstr.FieldsCbor(),
-		t,
-	)
+	type tTunaV1State TunaV1State
+	var tmpTunaV1State tTunaV1State
+	if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpTunaV1State); err != nil {
+		return err
+	}
+	*t = TunaV1State(tmpTunaV1State)
+	return nil
 }
 
 // TunaV2State represents the datum format used by the $TUNA mining smart contract (v2)
 type TunaV2State struct {
-	// This allows the type to be used with cbor.DecodeGeneric
+	// This allows the type to be reused during decoding
 	cbor.StructAsArray
 	BlockNumber      int64
 	CurrentHash      []byte
@@ -98,8 +101,11 @@ func (t *TunaV2State) UnmarshalCBOR(cborData []byte) error {
 	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
 		return err
 	}
-	return cbor.DecodeGeneric(
-		tmpConstr.FieldsCbor(),
-		t,
-	)
+	type tTunaV2State TunaV2State
+	var tmpTunaV2State tTunaV2State
+	if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpTunaV2State); err != nil {
+		return err
+	}
+	*t = TunaV2State(tmpTunaV2State)
+	return nil
 }
