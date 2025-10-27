@@ -189,7 +189,7 @@ func TestCardanoDnsDomainRecord_Encode_RoundTrip(t *testing.T) {
 		t.Fatalf("Invalid constructor tag for CardanoDnsDomainRecord: got %d want 1", cons.Constructor())
 	}
 	var got models.CardanoDnsDomainRecord
-	if err := cbor.DecodeGeneric(cons.FieldsCbor(), &got); err != nil {
+	if _, err := cbor.Decode(enc, &got); err != nil {
 		t.Fatalf("Failed to decode constructor fields into CardanoDnsDomainRecord: %v", err)
 	}
 	if !reflect.DeepEqual(got, rec) {

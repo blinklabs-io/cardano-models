@@ -23,7 +23,7 @@ import (
 type CardanoDnsTtl uint
 
 type CardanoDnsDomain struct {
-	// This allows the type to be used with cbor.DecodeGeneric
+	// This allows the type to be reused for the inner content during decoding
 	cbor.StructAsArray
 	Origin         []byte
 	Records        []CardanoDnsDomainRecord
@@ -58,7 +58,13 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 			tmpData.Constructor(),
 		)
 	}
-	return cbor.DecodeGeneric(tmpData.FieldsCbor(), c)
+	type tCardanoDnsDomain CardanoDnsDomain
+	var tmpCardanoDnsDomain tCardanoDnsDomain
+	if _, err := cbor.Decode(tmpData.FieldsCbor(), &tmpCardanoDnsDomain); err != nil {
+		return err
+	}
+	*c = CardanoDnsDomain(tmpCardanoDnsDomain)
+	return nil
 }
 
 func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
@@ -74,7 +80,7 @@ func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
 }
 
 type CardanoDnsDomainRecord struct {
-	// This allows the type to be used with cbor.DecodeGeneric
+	// This allows the type to be reused for the inner content during decoding
 	cbor.StructAsArray
 	Lhs  []byte
 	Ttl  CardanoDnsMaybe[CardanoDnsTtl]
@@ -93,7 +99,13 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 			tmpConstr.Constructor(),
 		)
 	}
-	return cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c)
+	type tCardanoDnsDomainRecord CardanoDnsDomainRecord
+	var tmpCardanoDnsDomainRecord tCardanoDnsDomainRecord
+	if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpCardanoDnsDomainRecord); err != nil {
+		return err
+	}
+	*c = CardanoDnsDomainRecord(tmpCardanoDnsDomainRecord)
+	return nil
 }
 
 func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
@@ -120,7 +132,7 @@ func (c *CardanoDnsDomainRecord) String() string {
 }
 
 type CardanoDnsMaybe[T any] struct {
-	// This allows the type to be used with cbor.DecodeGeneric
+	// This allows the type to be reused when decoding
 	cbor.StructAsArray
 	Value    T
 	hasValue bool
@@ -146,9 +158,12 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 		return err
 	}
 	if tmpConstr.Constructor() == 0 {
-		if err := cbor.DecodeGeneric(tmpConstr.FieldsCbor(), c); err != nil {
+		type tCardanoDnsMaybe CardanoDnsMaybe[T]
+		var tmpCardanoDnsMaybe tCardanoDnsMaybe
+		if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpCardanoDnsMaybe); err != nil {
 			return err
 		}
+		*c = CardanoDnsMaybe[T](tmpCardanoDnsMaybe)
 		c.hasValue = true
 	}
 	return nil
