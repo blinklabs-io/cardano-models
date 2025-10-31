@@ -1,4 +1,4 @@
-// Copyright 2023 Blink Labs Software
+// Copyright 2025 Blink Labs Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/blinklabs-io/gouroboros/cbor"
 )
@@ -31,20 +32,20 @@ type CardanoDnsDomain struct {
 }
 
 func (c *CardanoDnsDomain) String() string {
-	ret := fmt.Sprintf(
-		"CardanoDnsDomain { Origin = %s, Records = [ ",
-		c.Origin,
-	)
+	var sb strings.Builder
+	sb.WriteString("CardanoDnsDomain { Origin = ")
+	sb.WriteString(string(c.Origin))
+	sb.WriteString(", Records = [ ")
 	for idx, record := range c.Records {
-		ret += record.String()
+		sb.WriteString(record.String())
 		if idx == len(c.Records)-1 {
-			ret += " "
+			sb.WriteString(" ")
 		} else {
-			ret += ", "
+			sb.WriteString(", ")
 		}
 	}
-	ret += "] }"
-	return ret
+	sb.WriteString("] }")
+	return sb.String()
 }
 
 func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
