@@ -16,8 +16,8 @@ func TestValidCip20Metadata(t *testing.T) {
 	testCases := []struct {
 		name                     string
 		cborHex                  string
-		expectedObj              Cip20Metadata
 		jsonData                 string
+		expectedObj              Cip20Metadata
 		expectCBORUnmarshalError bool
 		expectJSONUnmarshalError bool
 		expectValidationError    bool
