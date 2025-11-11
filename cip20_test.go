@@ -140,7 +140,7 @@ func TestValidCip20Metadata(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc // capture range variable for goroutines
+		// capture range variable for goroutines
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
