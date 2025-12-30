@@ -122,7 +122,10 @@ func TestCardanoDnsRoundTripLossless(t *testing.T) {
 		}
 		var dec models.CardanoDnsDomain
 		if _, err := cbor.Decode(enc, &dec); err != nil {
-			t.Fatalf("Failed to decode CBOR back into CardanoDnsDomain: %v", err)
+			t.Fatalf(
+				"Failed to decode CBOR back into CardanoDnsDomain: %v",
+				err,
+			)
 		}
 		if !reflect.DeepEqual(dec, testDef.expectedObj) {
 			t.Fatalf("CBOR round-trip failed\n  got: %s\n  want: %s",
@@ -135,7 +138,9 @@ func TestCardanoDnsRoundTripLossless(t *testing.T) {
 
 // It verifies that CardanoDnsMaybe encodes using constructor 0 for "Just(value)" and constructor 1 for "None".
 func TestCardanoDnsMaybe_Encode_Constructors(t *testing.T) {
-	just := models.NewCardanoDnsMaybe[models.CardanoDnsTtl](models.CardanoDnsTtl(60))
+	just := models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+		models.CardanoDnsTtl(60),
+	)
 	none := models.NewCardanoDnsMaybe[models.CardanoDnsTtl](nil)
 
 	// Encode Just(value) and verify whether it uses constructor 0
@@ -148,7 +153,10 @@ func TestCardanoDnsMaybe_Encode_Constructors(t *testing.T) {
 		t.Fatalf("Failed to decode CBOR for 'Just(value)': %v", err)
 	}
 	if jc.Constructor() != 0 {
-		t.Fatalf("Invalid constructor for 'Just(value)': got %d want 0", jc.Constructor())
+		t.Fatalf(
+			"Invalid constructor for 'Just(value)': got %d want 0",
+			jc.Constructor(),
+		)
 	}
 
 	// Encode "None" value and verify whether it uses constructor 1 or not
@@ -161,7 +169,10 @@ func TestCardanoDnsMaybe_Encode_Constructors(t *testing.T) {
 		t.Fatalf("Failed to decode CBOR for 'None' value: %v", err)
 	}
 	if nc.Constructor() != 1 {
-		t.Fatalf("Invalid constructor for 'None' value: got %d want 1", nc.Constructor())
+		t.Fatalf(
+			"Invalid constructor for 'None' value: got %d want 1",
+			nc.Constructor(),
+		)
 	}
 }
 
@@ -186,13 +197,23 @@ func TestCardanoDnsDomainRecord_Encode_RoundTrip(t *testing.T) {
 		t.Fatalf("Failed to decode CBOR into Constructor: %v", err)
 	}
 	if cons.Constructor() != 1 {
-		t.Fatalf("Invalid constructor tag for CardanoDnsDomainRecord: got %d want 1", cons.Constructor())
+		t.Fatalf(
+			"Invalid constructor tag for CardanoDnsDomainRecord: got %d want 1",
+			cons.Constructor(),
+		)
 	}
 	var got models.CardanoDnsDomainRecord
 	if _, err := cbor.Decode(enc, &got); err != nil {
-		t.Fatalf("Failed to decode constructor fields into CardanoDnsDomainRecord: %v", err)
+		t.Fatalf(
+			"Failed to decode constructor fields into CardanoDnsDomainRecord: %v",
+			err,
+		)
 	}
 	if !reflect.DeepEqual(got, rec) {
-		t.Fatalf("Round-trip mismatch for CardanoDnsDomainRecord:\n  got: %+v\n  want: %+v", got, rec)
+		t.Fatalf(
+			"Round-trip mismatch for CardanoDnsDomainRecord:\n  got: %+v\n  want: %+v",
+			got,
+			rec,
+		)
 	}
 }

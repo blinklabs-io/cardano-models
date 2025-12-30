@@ -498,7 +498,9 @@ func TestCip25Metadata_RequiredFields(t *testing.T) {
 		policies := map[string]map[string]AssetMetadata{
 			"policy1": {
 				"asset1": {
-					Image: UriField{Uris: []string{"https://example.com/image.png"}},
+					Image: UriField{
+						Uris: []string{"https://example.com/image.png"},
+					},
 				},
 			},
 		}
@@ -541,11 +543,15 @@ func TestCip25Metadata_FilesValidation(t *testing.T) {
 			"policy1": {
 				"asset1": {
 					Name: "Test Asset",
-					Image: UriField{Uris: []string{"https://example.com/image.png"}},
+					Image: UriField{
+						Uris: []string{"https://example.com/image.png"},
+					},
 					Files: []FileDetails{
 						{
 							Name: "file1",
-							Src:  UriField{Uris: []string{"https://example.com/file1.png"}},
+							Src: UriField{
+								Uris: []string{"https://example.com/file1.png"},
+							},
 							// Missing MediaType
 						},
 					},
@@ -562,11 +568,15 @@ func TestCip25Metadata_FilesValidation(t *testing.T) {
 			"policy1": {
 				"asset1": {
 					Name: "Test Asset",
-					Image: UriField{Uris: []string{"https://example.com/image.png"}},
+					Image: UriField{
+						Uris: []string{"https://example.com/image.png"},
+					},
 					Files: []FileDetails{
 						{
 							MediaType: "image/png",
-							Src:       UriField{Uris: []string{"https://example.com/file1.png"}},
+							Src: UriField{
+								Uris: []string{"https://example.com/file1.png"},
+							},
 							// Missing Name
 						},
 					},
@@ -583,7 +593,9 @@ func TestCip25Metadata_FilesValidation(t *testing.T) {
 			"policy1": {
 				"asset1": {
 					Name: "Test Asset",
-					Image: UriField{Uris: []string{"https://example.com/image.png"}},
+					Image: UriField{
+						Uris: []string{"https://example.com/image.png"},
+					},
 					Files: []FileDetails{
 						{
 							Name:      "file1",
@@ -605,7 +617,9 @@ func TestCip25Metadata_VersionValidation(t *testing.T) {
 		"policy1": {
 			"asset1": {
 				Name: "Test Asset",
-				Image: UriField{Uris: []string{"https://example.com/image.png"}},
+				Image: UriField{
+					Uris: []string{"https://example.com/image.png"},
+				},
 			},
 		},
 	}
@@ -638,8 +652,10 @@ func TestCip25Metadata_MinimalValid(t *testing.T) {
 	policies := map[string]map[string]AssetMetadata{
 		"policy1": {
 			"asset1": {
-				Name:  "Test Asset",
-				Image: UriField{Uris: []string{"https://example.com/image.png"}},
+				Name: "Test Asset",
+				Image: UriField{
+					Uris: []string{"https://example.com/image.png"},
+				},
 			},
 		},
 	}
@@ -649,16 +665,26 @@ func TestCip25Metadata_MinimalValid(t *testing.T) {
 	require.Equal(t, 1, meta.Num721.Version)
 	require.Len(t, meta.Num721.Policies, 1)
 	require.Len(t, meta.Num721.Policies[HexBytes("policy1")], 1)
-	require.Equal(t, "Test Asset", meta.Num721.Policies[HexBytes("policy1")][HexBytes("asset1")].Name)
-	require.Equal(t, []string{"https://example.com/image.png"}, meta.Num721.Policies[HexBytes("policy1")][HexBytes("asset1")].Image.Uris)
+	require.Equal(
+		t,
+		"Test Asset",
+		meta.Num721.Policies[HexBytes("policy1")][HexBytes("asset1")].Name,
+	)
+	require.Equal(
+		t,
+		[]string{"https://example.com/image.png"},
+		meta.Num721.Policies[HexBytes("policy1")][HexBytes("asset1")].Image.Uris,
+	)
 }
 
 func TestCip25Metadata_Version1Vs2Keys(t *testing.T) {
 	policies := map[string]map[string]AssetMetadata{
 		"policy1": {
 			"asset1": {
-				Name:  "Test Asset",
-				Image: UriField{Uris: []string{"https://example.com/image.png"}},
+				Name: "Test Asset",
+				Image: UriField{
+					Uris: []string{"https://example.com/image.png"},
+				},
 			},
 		},
 	}
