@@ -2,10 +2,10 @@ github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20251001021608
 github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20251001021608-1fe7b43fc4d6/go.mod h1:ioLG6R+5bUSO1oeGSDxOV3FADARuMoytZCSX6MEMQkI=
 github.com/bits-and-blooms/bitset v1.20.0 h1:2F+rfL86jE2d/bmw7OhqUg2Sj/1rURkBn3MdfoPyRVU=
 github.com/bits-and-blooms/bitset v1.20.0/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
-github.com/blinklabs-io/gouroboros v0.153.1 h1:9Jj4hHFrVmmUbFAg4Jg8p8R07Cimb7rXJL5xrimGOi8=
-github.com/blinklabs-io/gouroboros v0.153.1/go.mod h1:MTwq+I/IMtzzWGN2Jd87uuryMfOD+3mQGYNFJn1PSFY=
-github.com/blinklabs-io/plutigo v0.0.22 h1:4O1+bac3pY2JPsIC9PvwthZWn6eFgkQ3R+z5t1rNeu8=
-github.com/blinklabs-io/plutigo v0.0.22/go.mod h1:gWmUk3afrNAwWkrHym/KjFDn63r4MAx/amtjZLkWNXM=
+github.com/blinklabs-io/gouroboros v0.157.0 h1:UNDo9OCvpb39goH7Ag8IvLmAA4Jf05hkj7g2dbmfEFg=
+github.com/blinklabs-io/gouroboros v0.157.0/go.mod h1:oD41po6mrWc4GkUta5TupkLLdUOA14ovLebuZHEKzt8=
+github.com/blinklabs-io/plutigo v0.0.23 h1:LtfWHc0bwpSLGekkO1ZBvMwo03JV/ZVpqoSIZwzjdco=
+github.com/blinklabs-io/plutigo v0.0.23/go.mod h1:gWmUk3afrNAwWkrHym/KjFDn63r4MAx/amtjZLkWNXM=
 github.com/btcsuite/btcd/btcec/v2 v2.3.6 h1:IzlsEr9olcSRKB/n7c4351F3xHKxS2lma+1UFGCYd4E=
 github.com/btcsuite/btcd/btcec/v2 v2.3.6/go.mod h1:m22FrOAiuxl/tht9wIqAoGHcbnCCaPWyauO8y2LGGtQ=
 github.com/btcsuite/btcd/btcutil v1.1.6 h1:zFL2+c3Lb9gEgqKNzowKUPQNb8jV7v5Oaodi/AYFd6c=
