@@ -1,12 +1,10 @@
 module github.com/blinklabs-io/cardano-models
 
-go 1.24.0
-
-toolchain go1.24.4
+go 1.25.7
 
 require (
-	github.com/blinklabs-io/gouroboros v0.153.1
-	github.com/fxamacker/cbor/v2 v2.9.0
+	github.com/blinklabs-io/gouroboros v0.165.2
+	github.com/fxamacker/cbor/v2 v2.9.1
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/stretchr/testify v1.11.1
 )
@@ -20,10 +18,11 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
