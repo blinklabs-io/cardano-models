@@ -14,7 +14,10 @@
 
 package models
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/fxamacker/cbor/v2"
+	"github.com/go-playground/validator/v10"
+)
 
 type Cip20Metadata struct {
 	Num674 Num674 `cbor:"674,keyasint" json:"674" validate:"required"`
@@ -22,6 +25,39 @@ type Cip20Metadata struct {
 
 type Num674 struct {
 	Msg []string `cbor:"msg" json:"msg" validate:"required,gt=0,dive,max=64"`
+}
+
+func (c *Cip20Metadata) UnmarshalCBOR(data []byte) error {
+	var raw map[any]cbor.RawMessage
+	if err := cbor.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	for key, value := range raw {
+		if !isCip20Label(key) {
+			continue
+		}
+		var num674 Num674
+		if err := cbor.Unmarshal(value, &num674); err != nil {
+			return err
+		}
+		c.Num674 = num674
+		return nil
+	}
+	return nil
+}
+
+func isCip20Label(key any) bool {
+	switch v := key.(type) {
+	case string:
+		return v == "674"
+	case uint64:
+		return v == 674
+	case int64:
+		return v == 674
+	case int:
+		return v == 674
+	}
+	return false
 }
 
 func NewCip20Metadata(messages []string) (*Cip20Metadata, error) {

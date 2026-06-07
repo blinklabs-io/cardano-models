@@ -148,14 +148,14 @@ func TestCardanoDnsMaybe_Encode_Constructors(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to encode 'Just(value)': %v", err)
 	}
-	var jc cbor.Constructor
+	var jc cbor.ConstructorDecoder
 	if _, err := cbor.Decode(justBytes, &jc); err != nil {
 		t.Fatalf("Failed to decode CBOR for 'Just(value)': %v", err)
 	}
-	if jc.Constructor() != 0 {
+	if jc.Tag() != 0 {
 		t.Fatalf(
 			"Invalid constructor for 'Just(value)': got %d want 0",
-			jc.Constructor(),
+			jc.Tag(),
 		)
 	}
 
@@ -164,14 +164,14 @@ func TestCardanoDnsMaybe_Encode_Constructors(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to encode 'None' value: %v", err)
 	}
-	var nc cbor.Constructor
+	var nc cbor.ConstructorDecoder
 	if _, err := cbor.Decode(noneBytes, &nc); err != nil {
 		t.Fatalf("Failed to decode CBOR for 'None' value: %v", err)
 	}
-	if nc.Constructor() != 1 {
+	if nc.Tag() != 1 {
 		t.Fatalf(
 			"Invalid constructor for 'None' value: got %d want 1",
-			nc.Constructor(),
+			nc.Tag(),
 		)
 	}
 }
@@ -192,14 +192,14 @@ func TestCardanoDnsDomainRecord_Encode_RoundTrip(t *testing.T) {
 		t.Fatalf("Failed to encode CardanoDnsDomainRecord to CBOR: %v", err)
 	}
 
-	var cons cbor.Constructor
+	var cons cbor.ConstructorDecoder
 	if _, err := cbor.Decode(enc, &cons); err != nil {
 		t.Fatalf("Failed to decode CBOR into Constructor: %v", err)
 	}
-	if cons.Constructor() != 1 {
+	if cons.Tag() != 1 {
 		t.Fatalf(
 			"Invalid constructor tag for CardanoDnsDomainRecord: got %d want 1",
-			cons.Constructor(),
+			cons.Tag(),
 		)
 	}
 	var got models.CardanoDnsDomainRecord

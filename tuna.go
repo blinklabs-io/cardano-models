@@ -37,7 +37,7 @@ func (t *TunaV1State) MarshalCBOR() ([]byte, error) {
 	for _, item := range t.Interlink {
 		tmpInterlink = append(tmpInterlink, item)
 	}
-	tmp := cbor.NewConstructor(
+	tmp := cbor.NewConstructorEncoder(
 		0,
 		cbor.IndefLengthList{
 			t.BlockNumber,
@@ -54,13 +54,13 @@ func (t *TunaV1State) MarshalCBOR() ([]byte, error) {
 }
 
 func (t *TunaV1State) UnmarshalCBOR(cborData []byte) error {
-	var tmpConstr cbor.Constructor
+	var tmpConstr cbor.ConstructorDecoder
 	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
 		return err
 	}
 	type tTunaV1State TunaV1State
 	var tmpTunaV1State tTunaV1State
-	if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpTunaV1State); err != nil {
+	if err := tmpConstr.DecodeFields(&tmpTunaV1State); err != nil {
 		return err
 	}
 	*t = TunaV1State(tmpTunaV1State)
@@ -81,7 +81,7 @@ type TunaV2State struct {
 }
 
 func (t *TunaV2State) MarshalCBOR() ([]byte, error) {
-	tmp := cbor.NewConstructor(
+	tmp := cbor.NewConstructorEncoder(
 		0,
 		cbor.IndefLengthList{
 			t.BlockNumber,
@@ -97,13 +97,13 @@ func (t *TunaV2State) MarshalCBOR() ([]byte, error) {
 }
 
 func (t *TunaV2State) UnmarshalCBOR(cborData []byte) error {
-	var tmpConstr cbor.Constructor
+	var tmpConstr cbor.ConstructorDecoder
 	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
 		return err
 	}
 	type tTunaV2State TunaV2State
 	var tmpTunaV2State tTunaV2State
-	if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpTunaV2State); err != nil {
+	if err := tmpConstr.DecodeFields(&tmpTunaV2State); err != nil {
 		return err
 	}
 	*t = TunaV2State(tmpTunaV2State)

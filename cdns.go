@@ -49,19 +49,19 @@ func (c *CardanoDnsDomain) String() string {
 }
 
 func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
-	var tmpData cbor.Constructor
+	var tmpData cbor.ConstructorDecoder
 	if _, err := cbor.Decode(cborData, &tmpData); err != nil {
 		return err
 	}
-	if tmpData.Constructor() != 1 {
+	if tmpData.Tag() != 1 {
 		return fmt.Errorf(
 			"unexpected constructor index: %d",
-			tmpData.Constructor(),
+			tmpData.Tag(),
 		)
 	}
 	type tCardanoDnsDomain CardanoDnsDomain
 	var tmpCardanoDnsDomain tCardanoDnsDomain
-	if _, err := cbor.Decode(tmpData.FieldsCbor(), &tmpCardanoDnsDomain); err != nil {
+	if err := tmpData.DecodeFields(&tmpCardanoDnsDomain); err != nil {
 		return err
 	}
 	*c = CardanoDnsDomain(tmpCardanoDnsDomain)
@@ -69,7 +69,7 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 }
 
 func (c *CardanoDnsDomain) MarshalCBOR() ([]byte, error) {
-	tmpData := cbor.NewConstructor(
+	tmpData := cbor.NewConstructorEncoder(
 		1,
 		[]any{
 			c.Origin,
@@ -90,19 +90,19 @@ type CardanoDnsDomainRecord struct {
 }
 
 func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
-	var tmpConstr cbor.Constructor
+	var tmpConstr cbor.ConstructorDecoder
 	if _, err := cbor.Decode(data, &tmpConstr); err != nil {
 		return err
 	}
-	if tmpConstr.Constructor() != 1 {
+	if tmpConstr.Tag() != 1 {
 		return fmt.Errorf(
 			"unexpected constructor index: %d",
-			tmpConstr.Constructor(),
+			tmpConstr.Tag(),
 		)
 	}
 	type tCardanoDnsDomainRecord CardanoDnsDomainRecord
 	var tmpCardanoDnsDomainRecord tCardanoDnsDomainRecord
-	if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpCardanoDnsDomainRecord); err != nil {
+	if err := tmpConstr.DecodeFields(&tmpCardanoDnsDomainRecord); err != nil {
 		return err
 	}
 	*c = CardanoDnsDomainRecord(tmpCardanoDnsDomainRecord)
@@ -110,7 +110,7 @@ func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
 }
 
 func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {
-	tmpData := cbor.NewConstructor(
+	tmpData := cbor.NewConstructorEncoder(
 		1,
 		[]any{
 			r.Lhs,
@@ -154,14 +154,14 @@ func (c CardanoDnsMaybe[T]) HasValue() bool {
 }
 
 func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
-	var tmpConstr cbor.Constructor
+	var tmpConstr cbor.ConstructorDecoder
 	if _, err := cbor.Decode(data, &tmpConstr); err != nil {
 		return err
 	}
-	if tmpConstr.Constructor() == 0 {
+	if tmpConstr.Tag() == 0 {
 		type tCardanoDnsMaybe CardanoDnsMaybe[T]
 		var tmpCardanoDnsMaybe tCardanoDnsMaybe
-		if _, err := cbor.Decode(tmpConstr.FieldsCbor(), &tmpCardanoDnsMaybe); err != nil {
+		if err := tmpConstr.DecodeFields(&tmpCardanoDnsMaybe); err != nil {
 			return err
 		}
 		*c = CardanoDnsMaybe[T](tmpCardanoDnsMaybe)
@@ -173,8 +173,8 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 func (m *CardanoDnsMaybe[T]) MarshalCBOR() ([]byte, error) {
 	if !m.HasValue() {
 		// None: constructor(1) with empty field array
-		return cbor.Encode(cbor.NewConstructor(1, []any{}))
+		return cbor.Encode(cbor.NewConstructorEncoder(1, []any{}))
 	}
 	// Some(Value): constructor(0) with single-field array
-	return cbor.Encode(cbor.NewConstructor(0, []any{m.Value}))
+	return cbor.Encode(cbor.NewConstructorEncoder(0, []any{m.Value}))
 }
