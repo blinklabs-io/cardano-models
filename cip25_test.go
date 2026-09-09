@@ -15,6 +15,7 @@
 package models
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"testing"
 
@@ -311,8 +312,29 @@ func TestCip25Metadata_Version2_JSON_RoundTrip(t *testing.T) {
 	require.Equal(t, unmarshaled, unmarshaled2)
 }
 
-// TODO: Add a fixture-based test that decodes a CBOR blob with raw byte keys (canonical v2 on-chain form)
-// to ensure interoperability with external CIP-25 v2 implementations.
+func TestCip25Metadata_Version2_CBOR_RawByteFixture(t *testing.T) {
+	// This fixture is an independently assembled CIP-25 v2 payload. Its policy
+	// and asset identifiers are CBOR byte strings, as required on-chain; it is
+	// intentionally not produced by MarshalCBOR in this package.
+	fixture, err := hex.DecodeString(
+		"a11902d1a26776657273696f6e02581c000102030405060708090a0b0c0d0e0f" +
+			"101112131415161718191a1ba1430a0b0ca2" +
+			"646e616d65634e465465696d6167656968747470733a2f2f78",
+	)
+	require.NoError(t, err)
+
+	var metadata Cip25Metadata
+	require.NoError(t, cbor.Unmarshal(fixture, &metadata))
+	require.Equal(t, 2, metadata.Num721.Version)
+	policyID := HexBytes("000102030405060708090a0b0c0d0e0f101112131415161718191a1b")
+	policy, ok := metadata.Num721.Policies[policyID]
+	require.True(t, ok, "fixture policy byte key should decode to hex")
+	asset, ok := policy[HexBytes("0a0b0c")]
+	require.True(t, ok, "fixture asset byte key should decode to hex")
+	require.Equal(t, "NFT", asset.Name)
+	require.Equal(t, []string{"https://x"}, asset.Image.Uris)
+}
+
 func TestCip25Metadata_Version2_CBOR_RoundTrip(t *testing.T) {
 	// Create a CIP-25 metadata object for version 2
 	policies := map[string]map[string]AssetMetadata{
@@ -725,15 +747,12 @@ func TestCip25Metadata_Version1Vs2Keys(t *testing.T) {
 		err = cbor.Unmarshal(data, &raw)
 		require.NoError(t, err)
 
-		// Keys should be strings for v1
-		for k := range raw {
-			if keyStr, ok := k.(string); ok {
-				if keyStr == "version" {
-					continue
-				}
-				require.Equal(t, "policy1", keyStr)
-			}
-		}
+		policyValue, ok := raw["policy1"]
+		require.True(t, ok, "version 1 policy key should be a string")
+		policyMap, ok := policyValue.(map[any]any)
+		require.True(t, ok)
+		_, ok = policyMap["asset1"]
+		require.True(t, ok, "version 1 asset key should be a string")
 	})
 
 	t.Run("version 2 CBOR keys are bytes", func(t *testing.T) {
@@ -748,14 +767,14 @@ func TestCip25Metadata_Version1Vs2Keys(t *testing.T) {
 		err = cbor.Unmarshal(data, &raw)
 		require.NoError(t, err)
 
-		// Keys should be byte strings for v2
-		foundByteKey := false
-		for k := range raw {
-			if _, ok := k.(cbor.ByteString); ok {
-				foundByteKey = true
-				break
-			}
-		}
-		require.True(t, foundByteKey, "Expected byte keys for version 2")
+		// Both policy and asset keys must be the expected byte strings for v2.
+		policyKey := cbor.ByteString("policy1")
+		policyValue, ok := raw[policyKey]
+		require.True(t, ok)
+		policyMap, ok := policyValue.(map[any]any)
+		require.True(t, ok)
+		assetKey := cbor.ByteString("asset1")
+		_, ok = policyMap[assetKey]
+		require.True(t, ok, "version 2 asset key should be the expected byte string")
 	})
 }
