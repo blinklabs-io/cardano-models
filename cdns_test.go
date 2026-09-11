@@ -22,6 +22,7 @@ import (
 	models "github.com/blinklabs-io/cardano-models"
 
 	"github.com/blinklabs-io/gouroboros/cbor"
+	"github.com/stretchr/testify/require"
 )
 
 var cardanoDnsTestDefs = []struct {
@@ -215,5 +216,55 @@ func TestCardanoDnsDomainRecord_Encode_RoundTrip(t *testing.T) {
 			got,
 			rec,
 		)
+	}
+}
+
+func TestCardanoDnsMaybe_DecodeValidation(t *testing.T) {
+	encode := func(t *testing.T, tag uint, fields any) []byte {
+		t.Helper()
+		data, err := cbor.Encode(cbor.NewConstructorEncoder(tag, fields))
+		require.NoError(t, err)
+		return data
+	}
+
+	someBytes := encode(t, 0, []any{models.CardanoDnsTtl(60)})
+	noneBytes := encode(t, 1, []any{})
+
+	t.Run("valid Some", func(t *testing.T) {
+		var got models.CardanoDnsMaybe[models.CardanoDnsTtl]
+		_, err := cbor.Decode(someBytes, &got)
+		require.NoError(t, err)
+		require.True(t, got.HasValue())
+		require.Equal(t, models.CardanoDnsTtl(60), got.Value)
+	})
+
+	t.Run("None clears reused Some", func(t *testing.T) {
+		got := models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+			models.CardanoDnsTtl(60),
+		)
+		_, err := cbor.Decode(noneBytes, &got)
+		require.NoError(t, err)
+		require.False(t, got.HasValue())
+		require.Zero(t, got.Value)
+	})
+
+	for name, data := range map[string][]byte{
+		"unknown constructor":        encode(t, 2, []any{}),
+		"Some without a field":       encode(t, 0, []any{}),
+		"Some with two fields":       encode(t, 0, []any{1, 2}),
+		"Some with wrong value type": encode(t, 0, []any{"wrong"}),
+		"None with a field":          encode(t, 1, []any{1}),
+		"Some with non-array fields": encode(t, 0, nil),
+		"None with non-array fields": encode(t, 1, nil),
+	} {
+		t.Run(name, func(t *testing.T) {
+			got := models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
+				models.CardanoDnsTtl(99),
+			)
+			_, err := cbor.Decode(data, &got)
+			require.Error(t, err)
+			require.True(t, got.HasValue())
+			require.Equal(t, models.CardanoDnsTtl(99), got.Value)
+		})
 	}
 }
