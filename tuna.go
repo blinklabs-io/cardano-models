@@ -15,6 +15,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/blinklabs-io/gouroboros/cbor"
 )
 
@@ -58,6 +60,9 @@ func (t *TunaV1State) UnmarshalCBOR(cborData []byte) error {
 	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
 		return err
 	}
+	if tmpConstr.Tag() != 0 {
+		return fmt.Errorf("unexpected constructor index: %d", tmpConstr.Tag())
+	}
 	type tTunaV1State TunaV1State
 	var tmpTunaV1State tTunaV1State
 	if err := tmpConstr.DecodeFields(&tmpTunaV1State); err != nil {
@@ -100,6 +105,9 @@ func (t *TunaV2State) UnmarshalCBOR(cborData []byte) error {
 	var tmpConstr cbor.ConstructorDecoder
 	if _, err := cbor.Decode(cborData, &tmpConstr); err != nil {
 		return err
+	}
+	if tmpConstr.Tag() != 0 {
+		return fmt.Errorf("unexpected constructor index: %d", tmpConstr.Tag())
 	}
 	type tTunaV2State TunaV2State
 	var tmpTunaV2State tTunaV2State

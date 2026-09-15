@@ -158,7 +158,15 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 	if _, err := cbor.Decode(data, &tmpConstr); err != nil {
 		return err
 	}
-	if tmpConstr.Tag() == 0 {
+	fields, err := tmpConstr.ParsedFields()
+	if err != nil {
+		return err
+	}
+	switch tmpConstr.Tag() {
+	case 0:
+		if len(fields) != 1 {
+			return fmt.Errorf("expected one field for Some, got %d", len(fields))
+		}
 		type tCardanoDnsMaybe CardanoDnsMaybe[T]
 		var tmpCardanoDnsMaybe tCardanoDnsMaybe
 		if err := tmpConstr.DecodeFields(&tmpCardanoDnsMaybe); err != nil {
@@ -166,6 +174,13 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 		}
 		*c = CardanoDnsMaybe[T](tmpCardanoDnsMaybe)
 		c.hasValue = true
+	case 1:
+		if len(fields) != 0 {
+			return fmt.Errorf("expected no fields for None, got %d", len(fields))
+		}
+		*c = CardanoDnsMaybe[T]{}
+	default:
+		return fmt.Errorf("unexpected constructor index: %d", tmpConstr.Tag())
 	}
 	return nil
 }
