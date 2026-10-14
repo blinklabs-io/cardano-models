@@ -211,6 +211,79 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "release.copyright")
 	})
+
+	t.Run("too many genres", func(t *testing.T) {
+		asset := singleRelease()
+		asset.Files[0].Song.Genres = []string{"Rock", "Pop", "Jazz", "Blues"}
+		_, err := NewCip60Metadata(
+			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+		)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "Genres")
+	})
+
+	t.Run("invalid song_duration format", func(t *testing.T) {
+		asset := singleRelease()
+		asset.Files[0].Song.SongDuration = "three minutes"
+		_, err := NewCip60Metadata(
+			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+		)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "SongDuration")
+	})
+
+	t.Run("missing song_title", func(t *testing.T) {
+		asset := singleRelease()
+		asset.Files[0].Song.SongTitle = DescField{}
+		_, err := NewCip60Metadata(
+			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+		)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "song.song_title")
+	})
+
+	t.Run("single release with common details on release", func(t *testing.T) {
+		asset := singleRelease()
+		asset.Release.Artists = []ArtistDetails{{Name: "Someone"}}
+		_, err := NewCip60Metadata(
+			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+		)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "release must not set")
+	})
+
+	t.Run("album release with common details on song", func(t *testing.T) {
+		asset := albumRelease()
+		asset.Files[0].Song.Genres = []string{"Electronic"}
+		_, err := NewCip60Metadata(
+			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+		)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "song must not set")
+	})
+}
+
+func TestCip60Metadata_Description_OmittedWhenUnset(t *testing.T) {
+	policies := map[string]map[string]MusicAssetMetadata{
+		"policy1": {"asset1": singleRelease()},
+	}
+	original, err := NewCip60Metadata(policies)
+	require.NoError(t, err)
+
+	data, err := json.Marshal(original)
+	require.NoError(t, err)
+	require.NotContains(t, string(data), "description")
+
+	asset := singleRelease()
+	asset.Description = &DescField{Descriptions: []string{"A great song"}}
+	withDesc, err := NewCip60Metadata(
+		map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+	)
+	require.NoError(t, err)
+
+	data, err = json.Marshal(withDesc)
+	require.NoError(t, err)
+	require.Contains(t, string(data), `"description":"A great song"`)
 }
 
 func TestCip60Metadata_JSON_RoundTrip(t *testing.T) {

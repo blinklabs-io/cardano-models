@@ -20,10 +20,31 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"sort"
 
 	"github.com/fxamacker/cbor/v2"
+	"github.com/go-playground/validator/v10"
 )
+
+// cip60SongDurationPattern matches the ISO-8601 duration subset required by
+// CIP-60 for song_duration: "^P(?!$)(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)$". Go's
+// RE2 engine doesn't support the lookaheads in that pattern, so this is
+// expressed as "PT" followed by at least one of hours/minutes/seconds,
+// enforced by also rejecting the literal "PT" (no components) below.
+var cip60SongDurationPattern = regexp.MustCompile(`^PT(\d+H)?(\d+M)?(\d+S)?$`)
+
+// validateCip60SongDuration implements the "cip60duration" validator tag.
+func validateCip60SongDuration(fl validator.FieldLevel) bool {
+	s := fl.Field().String()
+	return s != "PT" && cip60SongDurationPattern.MatchString(s)
+}
+
+func init() {
+	if err := validate.RegisterValidation("cip60duration", validateCip60SongDuration); err != nil {
+		panic(err)
+	}
+}
 
 // Cip60Metadata is the top-level container for CIP-60 music token metadata
 // under the "721" tag. CIP-60 extends CIP-25 (and optionally CIP-68) to add
@@ -202,7 +223,7 @@ type MusicAssetMetadata struct {
 	Files                []MusicFileDetails `json:"files"                  cbor:"files"                  validate:"required,min=1,dive"`
 	Version              int                `json:"version,omitempty"      cbor:"version,omitempty"      validate:"omitempty,oneof=1 2"`
 	MediaType            string             `json:"mediaType,omitempty"    cbor:"mediaType,omitempty"`
-	Description          DescField          `json:"description,omitempty"  cbor:"description,omitempty"`
+	Description          *DescField         `json:"description,omitempty"  cbor:"description,omitempty"`
 }
 
 // ReleaseDetails represents release-level metadata ("release_details").
@@ -229,7 +250,7 @@ type ReleaseDetails struct {
 // "Album/EP", in which case they belong on the release instead.
 type SongDetails struct {
 	SongTitle    DescField `json:"song_title"    cbor:"song_title"    validate:"required"`
-	SongDuration string    `json:"song_duration" cbor:"song_duration" validate:"required"`
+	SongDuration string    `json:"song_duration" cbor:"song_duration" validate:"required,cip60duration"`
 	TrackNumber  uint      `json:"track_number"  cbor:"track_number"  validate:"required"`
 
 	FeaturedArtists   []ArtistDetails `json:"featured_artists,omitempty"   cbor:"featured_artists,omitempty"   validate:"omitempty,dive"`
@@ -263,9 +284,16 @@ type SongDetails struct {
 // otherwise.
 type CommonMusicDetails struct {
 	Artists             []ArtistDetails             `json:"artists,omitempty"              cbor:"artists,omitempty"              validate:"omitempty,dive"`
-	Genres              []string                    `json:"genres,omitempty"               cbor:"genres,omitempty"`
+	Genres              []string                    `json:"genres,omitempty"               cbor:"genres,omitempty"               validate:"omitempty,min=1,max=3"`
 	Copyright           *CopyrightDetails           `json:"copyright,omitempty"            cbor:"copyright,omitempty"`
 	ContributingArtists []ContributingArtistDetails `json:"contributing_artists,omitempty" cbor:"contributing_artists,omitempty" validate:"omitempty,dive"`
+}
+
+// hasCommonMusicDetails reports whether any of the shared release/song
+// fields (artists, genres, copyright, contributing_artists) are set.
+func (c CommonMusicDetails) hasCommonMusicDetails() bool {
+	return len(c.Artists) > 0 || len(c.Genres) > 0 || c.Copyright != nil ||
+		len(c.ContributingArtists) > 0
 }
 
 // MusicFileDetails represents a file entry extended with song metadata
@@ -357,9 +385,14 @@ func (c *Cip60Metadata) Validate() error {
 }
 
 // validatePlacement enforces that artists, genres, and copyright appear on
-// the release when ReleaseType is "Album/EP", and on each song otherwise.
+// the release when ReleaseType is "Album/EP", and on each song otherwise,
+// rejecting them from the disallowed level. It also requires a non-empty
+// song_title on every song, which the "required" struct tag cannot enforce
+// reliably on a DescField value.
 func (a MusicAssetMetadata) validatePlacement() error {
-	if a.Release.ReleaseType == "Album/EP" {
+	isAlbum := a.Release.ReleaseType == "Album/EP"
+
+	if isAlbum {
 		if len(a.Release.Artists) == 0 {
 			return errors.New(
 				"release.artists is required when release_type is Album/EP",
@@ -375,10 +408,28 @@ func (a MusicAssetMetadata) validatePlacement() error {
 				"release.copyright is required when release_type is Album/EP",
 			)
 		}
-		return nil
+	} else if a.Release.hasCommonMusicDetails() {
+		return fmt.Errorf(
+			"release must not set artists, genres, copyright, or contributing_artists when release_type is %s (use song instead)",
+			a.Release.ReleaseType,
+		)
 	}
 
 	for i, file := range a.Files {
+		if len(file.Song.SongTitle.Descriptions) == 0 {
+			return fmt.Errorf("files[%d].song.song_title is required", i)
+		}
+
+		if isAlbum {
+			if file.Song.hasCommonMusicDetails() {
+				return fmt.Errorf(
+					"files[%d].song must not set artists, genres, copyright, or contributing_artists when release_type is Album/EP (use release instead)",
+					i,
+				)
+			}
+			continue
+		}
+
 		if len(file.Song.Artists) == 0 {
 			return fmt.Errorf(
 				"files[%d].song.artists is required when release_type is %s",
