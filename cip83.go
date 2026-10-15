@@ -123,8 +123,7 @@ func EncryptCip83Message(
 	padded := cip83Pkcs7Pad(plaintext, aes.BlockSize)
 	ciphertext := make([]byte, len(padded))
 	cipher.NewCBCEncrypter(block, iv).CryptBlocks(ciphertext, padded)
-	out := make([]byte, 0, len(cip83SaltedPrefix)+len(salt)+len(ciphertext))
-	out = append(out, cip83SaltedPrefix...)
+	out := append([]byte{}, cip83SaltedPrefix...)
 	out = append(out, salt...)
 	out = append(out, ciphertext...)
 	encoded := base64.StdEncoding.EncodeToString(out)
@@ -199,7 +198,7 @@ func cip83DeriveKeyIv(passphrase string, salt []byte) (key, iv []byte) {
 }
 
 func cip83SplitLines(s string) []string {
-	lines := make([]string, 0, (len(s)+cip83MaxLineLength-1)/cip83MaxLineLength)
+	var lines []string
 	for i := 0; i < len(s); i += cip83MaxLineLength {
 		end := min(i+cip83MaxLineLength, len(s))
 		lines = append(lines, s[i:end])
@@ -209,9 +208,8 @@ func cip83SplitLines(s string) []string {
 
 func cip83Pkcs7Pad(data []byte, blockSize int) []byte {
 	padLen := blockSize - len(data)%blockSize
-	padded := make([]byte, 0, len(data)+padLen)
-	padded = append(padded, data...)
 	padByte := byte(padLen) //nolint:gosec // padLen is bounded by blockSize (16)
+	padded := append([]byte{}, data...)
 	padded = append(padded, bytes.Repeat([]byte{padByte}, padLen)...)
 	return padded
 }
