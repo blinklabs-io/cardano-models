@@ -146,6 +146,16 @@ func TestDecryptCip83Message_WrongPassphraseFails(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestEncryptCip83Message_EmptyMessagesRejected(t *testing.T) {
+	t.Parallel()
+
+	_, err := EncryptCip83Message(nil, "")
+	require.Error(t, err)
+
+	_, err = EncryptCip83Message([]string{}, "")
+	require.Error(t, err)
+}
+
 func TestDecryptCip83Message_PlainPassthrough(t *testing.T) {
 	t.Parallel()
 

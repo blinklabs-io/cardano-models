@@ -104,6 +104,9 @@ func EncryptCip83Message(
 	messages []string,
 	passphrase string,
 ) (*Cip83Metadata, error) {
+	if len(messages) == 0 {
+		return nil, errors.New("cip83: at least one message is required")
+	}
 	if passphrase == "" {
 		passphrase = Cip83DefaultPassphrase
 	}
