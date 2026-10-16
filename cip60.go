@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/go-playground/validator/v10"
@@ -58,6 +59,11 @@ type Cip60Metadata struct {
 //
 //nolint:recvcheck
 type MusicNum721 struct {
+	// Version carries the CIP-25 "721" version marker CIP-60 inherits:
+	// absent/1 means policy_id/asset_name map keys are text, 2 means they
+	// are byte strings. It governs CBOR/JSON key encoding below, so it
+	// must not be left to per-key hex sniffing (see MarshalCBOR).
+	Version  int                                          `json:"version,omitempty" cbor:"version,omitempty" validate:"omitempty,min=1,max=2"`
 	Policies map[HexBytes]map[HexBytes]MusicAssetMetadata `json:"-" cbor:"" validate:"required,min=1,dive,dive"`
 }
 
@@ -68,9 +74,27 @@ func (n *MusicNum721) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	// Check for version (handle both number and string)
+	if v, ok := raw["version"]; ok {
+		switch version := v.(type) {
+		case float64:
+			n.Version = int(version)
+		case string:
+			if f, err := strconv.ParseFloat(version, 64); err == nil {
+				n.Version = int(f)
+			}
+		}
+	} else {
+		// Default to version 1 if not specified
+		n.Version = 1
+	}
+
 	n.Policies = make(map[HexBytes]map[HexBytes]MusicAssetMetadata)
 
 	for key, value := range raw {
+		if key == "version" {
+			continue
+		}
 		// key is policy_id, value is map[asset_name]MusicAssetMetadata
 		policyMap, ok := value.(map[string]any)
 		if !ok {
@@ -98,6 +122,9 @@ func (n *MusicNum721) UnmarshalJSON(data []byte) error {
 // MarshalJSON handles marshaling the MusicNum721 structure.
 func (n MusicNum721) MarshalJSON() ([]byte, error) {
 	out := make(map[string]any)
+	if n.Version > 1 {
+		out["version"] = n.Version
+	}
 	for policy, assets := range n.Policies {
 		out[string(policy)] = assets
 	}
@@ -126,9 +153,29 @@ func (n *MusicNum721) UnmarshalCBOR(data []byte) error {
 		return err
 	}
 
+	// Check for version
+	for key, value := range raw {
+		if keyStr, ok := key.(string); ok && keyStr == "version" {
+			if version, ok := value.(uint64); ok {
+				if version > 100 {
+					return errors.New("version number too large")
+				}
+				n.Version = int(version)
+			}
+			break
+		}
+	}
+	if n.Version == 0 {
+		// Default to version 1
+		n.Version = 1
+	}
+
 	n.Policies = make(map[HexBytes]map[HexBytes]MusicAssetMetadata)
 
 	for key, value := range raw {
+		if keyStr, ok := key.(string); ok && keyStr == "version" {
+			continue
+		}
 		k, err := decodeCborMapKey(key)
 		if err != nil {
 			return err
@@ -168,6 +215,14 @@ func (n MusicNum721) MarshalCBOR() ([]byte, error) {
 	if err := enc.StartIndefiniteMap(); err != nil {
 		return nil, err
 	}
+	if n.Version > 1 {
+		if err := enc.Encode("version"); err != nil {
+			return nil, err
+		}
+		if err := enc.Encode(n.Version); err != nil {
+			return nil, err
+		}
+	}
 
 	keys := make([]HexBytes, 0, len(n.Policies))
 	for policy := range n.Policies {
@@ -178,7 +233,7 @@ func (n MusicNum721) MarshalCBOR() ([]byte, error) {
 	})
 
 	for _, k := range keys {
-		if err := enc.Encode(k); err != nil {
+		if err := encodeCip60MapKey(enc, k, n.Version); err != nil {
 			return nil, err
 		}
 
@@ -195,7 +250,7 @@ func (n MusicNum721) MarshalCBOR() ([]byte, error) {
 			return nil, err
 		}
 		for _, ik := range innerKeys {
-			if err := enc.Encode(ik); err != nil {
+			if err := encodeCip60MapKey(enc, ik, n.Version); err != nil {
 				return nil, err
 			}
 			if err := enc.Encode(inner[ik]); err != nil {
@@ -211,6 +266,23 @@ func (n MusicNum721) MarshalCBOR() ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+// encodeCip60MapKey encodes a policy_id/asset_name map key per the
+// declared CIP-25 "721" version: version 1 (the default, including an
+// unset Version of 0) encodes as text, version 2 as a byte string. This
+// must not delegate to HexBytes.MarshalCBOR, which guesses the wire type
+// from whether the key looks like hex and would silently turn ordinary
+// hex-looking text keys (e.g. a policy ID or asset name) into byte
+// strings under the default version.
+func encodeCip60MapKey(enc *cbor.Encoder, k HexBytes, version int) error {
+	if version != 2 {
+		return enc.Encode(string(k))
+	}
+	if b, err := hex.DecodeString(string(k)); err == nil {
+		return enc.Encode(b)
+	}
+	return enc.Encode([]byte(string(k)))
 }
 
 // MusicAssetMetadata represents the CIP-60 "metadata_details" for a single

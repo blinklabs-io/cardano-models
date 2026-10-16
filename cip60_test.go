@@ -341,3 +341,59 @@ func TestCip60Metadata_CBOR_RoundTrip(t *testing.T) {
 	require.Equal(t, "Mr. Bad Guy", asset.Release.ReleaseTitle)
 	require.Equal(t, []string{"Rock", "Classic Rock"}, asset.Files[0].Song.Genres)
 }
+
+// TestCip60Metadata_CBOR_TextKeysByDefault asserts that, under the default
+// (absent) CIP-25 "721" version, policy_id/asset_name map keys are encoded
+// as CBOR text strings on the wire even when they look like hex: a real
+// policy ID (56 hex chars) and a hex-looking UTF-8 asset name ("AB", valid
+// hex digits) must not be silently converted to byte strings, which would
+// change the asset identity/type seen by indexers.
+func TestCip60Metadata_CBOR_TextKeysByDefault(t *testing.T) {
+	const policyID = "c00d776a22ca5db986039420b2a9b3f880d593136a9e2262fabeeb58"
+	const assetName = "AB"
+
+	policies := map[string]map[string]MusicAssetMetadata{
+		policyID: {assetName: singleRelease()},
+	}
+	meta, err := NewCip60Metadata(policies)
+	require.NoError(t, err)
+
+	data, err := cbor.Marshal(meta)
+	require.NoError(t, err)
+
+	var raw map[any]any
+	require.NoError(t, cbor.Unmarshal(data, &raw))
+	inner, ok := raw[uint64(721)].(map[any]any)
+	require.True(t, ok, "expected a map under the 721 label")
+
+	for policyKey, policyValue := range inner {
+		_, isString := policyKey.(string)
+		require.Truef(
+			t,
+			isString,
+			"policy key %v (%T) should be encoded as CBOR text, not bytes",
+			policyKey,
+			policyKey,
+		)
+		require.Equal(t, policyID, policyKey)
+
+		assetMap, ok := policyValue.(map[any]any)
+		require.True(t, ok, "expected a map of asset names")
+		for assetKey := range assetMap {
+			_, isString := assetKey.(string)
+			require.Truef(
+				t,
+				isString,
+				"asset key %v (%T) should be encoded as CBOR text, not bytes",
+				assetKey,
+				assetKey,
+			)
+			require.Equal(t, assetName, assetKey)
+		}
+	}
+
+	var unmarshaled Cip60Metadata
+	require.NoError(t, cbor.Unmarshal(data, &unmarshaled))
+	_, ok = unmarshaled.Num721.Policies[HexBytes(policyID)][HexBytes(assetName)]
+	require.True(t, ok)
+}
