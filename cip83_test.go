@@ -208,6 +208,14 @@ func TestNewCip83Metadata_ValidationErrors(t *testing.T) {
 			enc:      Cip83EncPlain,
 			messages: []string{strings.Repeat("a", 65)},
 		},
+		{
+			// 33 "é" (2 bytes each in UTF-8) = 66 encoded bytes, which
+			// exceeds Cardano's 64-byte limit even though it is only 33
+			// Unicode code points.
+			name:     "multibyte message line exceeds byte limit",
+			enc:      Cip83EncPlain,
+			messages: []string{strings.Repeat("é", 33)},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -216,6 +224,40 @@ func TestNewCip83Metadata_ValidationErrors(t *testing.T) {
 
 			_, err := NewCip83Metadata(tc.enc, tc.messages)
 			require.Error(t, err)
+		})
+	}
+}
+
+func TestNewCip83Metadata_MsgByteLimitBoundary(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name    string
+		message string
+	}{
+		{
+			name:    "exactly 64 ASCII bytes is allowed",
+			message: strings.Repeat("a", 64),
+		},
+		{
+			// 32 "é" (2 bytes each) = exactly 64 encoded bytes.
+			name:    "exactly 64 multibyte bytes is allowed",
+			message: strings.Repeat("é", 32),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			require.Equal(t, 64, len(tc.message))
+
+			metadata, err := NewCip83Metadata(
+				Cip83EncPlain,
+				[]string{tc.message},
+			)
+			require.NoError(t, err)
+			require.NoError(t, metadata.Validate())
 		})
 	}
 }

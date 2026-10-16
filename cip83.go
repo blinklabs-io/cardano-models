@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/fxamacker/cbor/v2"
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -50,6 +51,22 @@ const (
 
 var cip83SaltedPrefix = []byte("Salted__")
 
+// validateCip83MsgLine implements the "cip83msgbytes" validator tag. Cardano
+// limits each metadata text value to 64 *encoded bytes*, but validator's
+// built-in "max" tag counts Unicode code points for strings, so a line with
+// multibyte characters could pass max=64 while exceeding the 64-byte limit
+// on the wire. len() on a Go string already counts UTF-8 encoded bytes, so
+// comparing against cip83MaxLineLength directly enforces the real limit.
+func validateCip83MsgLine(fl validator.FieldLevel) bool {
+	return len(fl.Field().String()) <= cip83MaxLineLength
+}
+
+func init() {
+	if err := validate.RegisterValidation("cip83msgbytes", validateCip83MsgLine); err != nil {
+		panic(err)
+	}
+}
+
 // Cip83Metadata is the top-level container for CIP-83 encrypted transaction
 // message metadata under the "674" tag. It is an addendum to CIP-20, adding
 // an optional "enc" field alongside the existing "msg" field.
@@ -60,7 +77,7 @@ type Cip83Metadata struct {
 // Num674Enc represents the metadata structure for CIP-83.
 type Num674Enc struct {
 	Enc string   `cbor:"enc,omitempty" json:"enc,omitempty" validate:"omitempty,oneof=plain basic"`
-	Msg []string `cbor:"msg"           json:"msg"           validate:"required,gt=0,dive,max=64"`
+	Msg []string `cbor:"msg"           json:"msg"           validate:"required,gt=0,dive,cip83msgbytes"`
 }
 
 func (c *Cip83Metadata) UnmarshalCBOR(data []byte) error {
