@@ -49,22 +49,41 @@ func (c *CardanoDnsDomain) String() string {
 }
 
 func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
-	var tmpData cbor.ConstructorDecoder
-	if _, err := cbor.Decode(cborData, &tmpData); err != nil {
+	tmpData, err := decodeCardanoDnsConstructor(
+		cborData,
+		"CardanoDnsDomain",
+	)
+	if err != nil {
 		return err
 	}
-	if tmpData.Tag() != 1 {
-		return fmt.Errorf(
-			"unexpected constructor index: %d",
-			tmpData.Tag(),
-		)
+	type cardanoDnsDomainFields struct {
+		cbor.StructAsArray
+		Origin         []byte
+		Records        []cbor.RawMessage
+		AdditionalData CardanoDnsMaybe[any]
 	}
-	type tCardanoDnsDomain CardanoDnsDomain
-	var tmpCardanoDnsDomain tCardanoDnsDomain
+	var tmpCardanoDnsDomain cardanoDnsDomainFields
 	if err := tmpData.DecodeFields(&tmpCardanoDnsDomain); err != nil {
-		return err
+		return fmt.Errorf("decode CardanoDnsDomain fields: %w", err)
 	}
-	*c = CardanoDnsDomain(tmpCardanoDnsDomain)
+	records := make(
+		[]CardanoDnsDomainRecord,
+		len(tmpCardanoDnsDomain.Records),
+	)
+	for idx, recordData := range tmpCardanoDnsDomain.Records {
+		if _, err := cbor.DecodeExact(recordData, &records[idx]); err != nil {
+			return fmt.Errorf(
+				"decode CardanoDnsDomain record %d: %w",
+				idx,
+				err,
+			)
+		}
+	}
+	*c = CardanoDnsDomain{
+		Origin:         tmpCardanoDnsDomain.Origin,
+		Records:        records,
+		AdditionalData: tmpCardanoDnsDomain.AdditionalData,
+	}
 	return nil
 }
 
@@ -90,23 +109,42 @@ type CardanoDnsDomainRecord struct {
 }
 
 func (c *CardanoDnsDomainRecord) UnmarshalCBOR(data []byte) error {
-	var tmpConstr cbor.ConstructorDecoder
-	if _, err := cbor.Decode(data, &tmpConstr); err != nil {
+	tmpConstr, err := decodeCardanoDnsConstructor(
+		data,
+		"CardanoDnsDomainRecord",
+	)
+	if err != nil {
 		return err
-	}
-	if tmpConstr.Tag() != 1 {
-		return fmt.Errorf(
-			"unexpected constructor index: %d",
-			tmpConstr.Tag(),
-		)
 	}
 	type tCardanoDnsDomainRecord CardanoDnsDomainRecord
 	var tmpCardanoDnsDomainRecord tCardanoDnsDomainRecord
 	if err := tmpConstr.DecodeFields(&tmpCardanoDnsDomainRecord); err != nil {
-		return err
+		return fmt.Errorf("decode CardanoDnsDomainRecord fields: %w", err)
 	}
 	*c = CardanoDnsDomainRecord(tmpCardanoDnsDomainRecord)
 	return nil
+}
+
+func decodeCardanoDnsConstructor(
+	data []byte,
+	typeName string,
+) (cbor.ConstructorDecoder, error) {
+	var constructor cbor.ConstructorDecoder
+	if _, err := cbor.DecodeExact(data, &constructor); err != nil {
+		return constructor, fmt.Errorf(
+			"decode %s constructor: %w",
+			typeName,
+			err,
+		)
+	}
+	if constructor.Tag() != 1 {
+		return constructor, fmt.Errorf(
+			"decode %s: unexpected constructor index: %d",
+			typeName,
+			constructor.Tag(),
+		)
+	}
+	return constructor, nil
 }
 
 func (r *CardanoDnsDomainRecord) MarshalCBOR() ([]byte, error) {

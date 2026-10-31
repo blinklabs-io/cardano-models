@@ -268,3 +268,154 @@ func TestCardanoDnsMaybe_DecodeValidation(t *testing.T) {
 		})
 	}
 }
+
+func TestCardanoDnsDomain_DecodeValidation(t *testing.T) {
+	encode := func(t *testing.T, value any) []byte {
+		t.Helper()
+		data, err := cbor.Encode(value)
+		require.NoError(t, err)
+		return data
+	}
+	none := cbor.NewConstructorEncoder(1, []any{})
+	validRecord := cbor.NewConstructorEncoder(
+		1,
+		[]any{[]byte("example.cardano"), none, []byte("A"), []byte("192.0.2.1")},
+	)
+	domain := func(records any) cbor.ConstructorEncoder {
+		return cbor.NewConstructorEncoder(
+			1,
+			[]any{[]byte("example"), records, none},
+		)
+	}
+
+	for name, testDef := range map[string]struct {
+		data       []byte
+		errorParts []string
+	}{
+		"invalid CBOR": {
+			data:       []byte{0xff},
+			errorParts: []string{"unexpected \"break\" code"},
+		},
+		"wrong domain constructor": {
+			data: encode(t, cbor.NewConstructorEncoder(2, []any{})),
+			errorParts: []string{
+				"CardanoDnsDomain",
+				"unexpected constructor index: 2",
+			},
+		},
+		"wrong origin type": {
+			data: encode(t, cbor.NewConstructorEncoder(
+				1,
+				[]any{"example", []any{validRecord}, none},
+			)),
+			errorParts: []string{"decode CardanoDnsDomain fields", "Origin"},
+		},
+		"wrong records type": {
+			data: encode(t, domain(uint64(0))),
+			errorParts: []string{
+				"decode CardanoDnsDomain fields",
+				"Records",
+			},
+		},
+		"record is not a constructor": {
+			data: encode(t, domain([]any{uint64(0)})),
+			errorParts: []string{
+				"decode CardanoDnsDomain record 0",
+				"decode CardanoDnsDomainRecord constructor",
+			},
+		},
+		"wrong record constructor": {
+			data: encode(t, domain([]any{
+				cbor.NewConstructorEncoder(2, []any{}),
+			})),
+			errorParts: []string{
+				"decode CardanoDnsDomain record 0",
+				"CardanoDnsDomainRecord",
+				"unexpected constructor index: 2",
+			},
+		},
+		"wrong record field type": {
+			data: encode(t, domain([]any{
+				cbor.NewConstructorEncoder(
+					1,
+					[]any{"example.cardano", none, []byte("A"), []byte("192.0.2.1")},
+				),
+			})),
+			errorParts: []string{
+				"decode CardanoDnsDomain record 0",
+				"decode CardanoDnsDomainRecord fields",
+				"Lhs",
+			},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			original := models.CardanoDnsDomain{
+				Origin:  []byte("unchanged"),
+				Records: []models.CardanoDnsDomainRecord{{Lhs: []byte("unchanged")}},
+			}
+			got := original
+			_, err := cbor.Decode(testDef.data, &got)
+			require.Error(t, err)
+			for _, errorPart := range testDef.errorParts {
+				require.ErrorContains(t, err, errorPart)
+			}
+			require.Equal(t, original, got)
+		})
+	}
+}
+
+func TestCardanoDnsDomainRecord_DecodeValidation(t *testing.T) {
+	encode := func(t *testing.T, value any) []byte {
+		t.Helper()
+		data, err := cbor.Encode(value)
+		require.NoError(t, err)
+		return data
+	}
+	none := cbor.NewConstructorEncoder(1, []any{})
+
+	for name, testDef := range map[string]struct {
+		data       []byte
+		errorParts []string
+	}{
+		"wrong constructor": {
+			data: encode(t, cbor.NewConstructorEncoder(0, []any{})),
+			errorParts: []string{
+				"CardanoDnsDomainRecord",
+				"unexpected constructor index: 0",
+			},
+		},
+		"missing field": {
+			data: encode(t, cbor.NewConstructorEncoder(
+				1,
+				[]any{[]byte("example.cardano"), none, []byte("A")},
+			)),
+			errorParts: []string{"decode CardanoDnsDomainRecord fields"},
+		},
+		"wrong TTL value type": {
+			data: encode(t, cbor.NewConstructorEncoder(
+				1,
+				[]any{
+					[]byte("example.cardano"),
+					cbor.NewConstructorEncoder(0, []any{"sixty"}),
+					[]byte("A"),
+					[]byte("192.0.2.1"),
+				},
+			)),
+			errorParts: []string{
+				"decode CardanoDnsDomainRecord fields",
+				"Ttl",
+			},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			original := models.CardanoDnsDomainRecord{Lhs: []byte("unchanged")}
+			got := original
+			_, err := cbor.Decode(testDef.data, &got)
+			require.Error(t, err)
+			for _, errorPart := range testDef.errorParts {
+				require.ErrorContains(t, err, errorPart)
+			}
+			require.Equal(t, original, got)
+		})
+	}
+}
