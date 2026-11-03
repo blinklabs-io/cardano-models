@@ -4,7 +4,7 @@ go 1.26.10
 
 require (
 	github.com/blinklabs-io/gouroboros v0.216.2
-	github.com/fxamacker/cbor/v2 v2.9.6
+	github.com/fxamacker/cbor/v2 v2.10.0
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/crypto v0.58.0
