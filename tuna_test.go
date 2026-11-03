@@ -39,7 +39,8 @@ func TestTunaV1State_DecodeConstructorValidation(t *testing.T) {
 		bad, err := cbor.Encode(cbor.NewConstructorEncoder(tag, cbor.IndefLengthList{
 			valid.BlockNumber, valid.CurrentHash, valid.LeadingZeros,
 			valid.DifficultyNumber, valid.EpochTime, valid.RealTimeNow,
-			valid.Extra, cbor.IndefLengthList{[]byte{7}},
+			valid.Extra,
+			cbor.IndefLengthList{[]byte{7}},
 		}))
 		require.NoError(t, err)
 		want := models.TunaV1State{
