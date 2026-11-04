@@ -419,3 +419,26 @@ func TestCardanoDnsDomainRecord_DecodeValidation(t *testing.T) {
 		})
 	}
 }
+
+func TestCardanoDnsDomain_EmptyRecordsRoundTrip(t *testing.T) {
+	for name, records := range map[string][]models.CardanoDnsDomainRecord{
+		"nil":   nil,
+		"empty": {},
+	} {
+		t.Run(name, func(t *testing.T) {
+			orig := models.CardanoDnsDomain{
+				Origin:         []byte("example"),
+				Records:        records,
+				AdditionalData: models.CardanoDnsMaybe[any]{},
+			}
+			enc, err := cbor.Encode(orig)
+			require.NoError(t, err)
+			var dec models.CardanoDnsDomain
+			_, err = cbor.Decode(enc, &dec)
+			require.NoError(t, err)
+			reenc, err := cbor.Encode(dec)
+			require.NoError(t, err)
+			require.Equal(t, enc, reenc)
+		})
+	}
+}
