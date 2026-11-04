@@ -1,6 +1,6 @@
 # Cardano Models Roadmap
 
-**Last Updated**: 2026-02-22
+**Last Updated**: 2026-11-04
 
 ## Vision
 
@@ -10,7 +10,7 @@ Cardano Models serves as the centralized library for Cardano application-layer d
 
 ---
 
-## Current State (v0.7.0)
+## Current State (v0.7.2)
 
 ### Implemented Models
 
@@ -20,21 +20,33 @@ Cardano Models serves as the centralized library for Cardano application-layer d
 | CIP-25 v1 | NFT Metadata | Label 721 basic | Complete (with tests) |
 | CIP-25 v2 | NFT Metadata | Label 721 extended | Complete (with tests) |
 | CIP-27 | Royalty Metadata | Label 777 | Complete (with tests) |
-| CDNS | Cardano DNS | Domain resolution | Partial (CBOR serde + tests done, JSON serde outstanding) |
-| TUNA v1 | Mining Contract | Datum format | Implementation complete, no tests |
-| TUNA v2 | Mining Contract | Extended datum | Implementation complete, no tests |
+| CIP-60 | Music Token Metadata | Label 721 music extension | Complete (with tests) |
+| CIP-83 | Encrypted Messages | Label 674 encrypted payloads | Complete (with tests) |
+| CDNS | Cardano DNS | Domain resolution | Partial (CBOR serde, decode validation and tests done; JSON serde outstanding) |
+| TUNA v1 | Mining Contract | Datum format | Implemented; constructor validation tests only, no round-trip tests |
+| TUNA v2 | Mining Contract | Extended datum | Implemented; constructor validation tests only, no round-trip tests |
+
+### Recently Completed
+
+| PR | Change |
+|----|--------|
+| #275 | CIP-60 music token models (closes #5) |
+| #276 | CIP-83 encrypted message models (closes #6) |
+| #280 | Validate Cardano DNS record decoding (closes #13) |
+| #264 | Validate model constructors |
+| #263 | Cover CIP-25 CBOR key types |
 
 ### Open Issues
 
 | Issue | Title | Priority |
 |-------|-------|----------|
-| #108 | Support JSON serde in CDNS | Medium |
-| #30 | Create tests for Tuna models | High |
-| #13 | Improve decoding for CardanoDnsDomain | Medium |
-| #6 | CIP-83 Encrypted messages | High |
-| #5 | CIP-60 Music token metadata | Medium |
 | #4 | CIP-36 Catalyst/Voltaire registration | High |
+| #30 | Create tests for Tuna models | High |
+| #210 | Implement CIP-68 datum metadata standard | Medium |
 | #3 | CIP-15 Catalyst registrations | Medium |
+| #108 | Support JSON serde in CDNS | Medium |
+| #225 | CIP-88 Token Policy Registration | Medium |
+| #259 | Validate CBOR constructor tags and independent CIP-25 fixtures | Medium |
 
 ---
 
@@ -46,10 +58,10 @@ Cardano Models serves as the centralized library for Cardano application-layer d
 
 | Milestone | Description | Plan | Status |
 |-----------|-------------|------|--------|
-| M1.1 | Add comprehensive tests for TUNA models | [TUNA_MODELS_PLAN.md](docs/plans/TUNA_MODELS_PLAN.md) | Not started |
-| M1.2 | Improve CDNS decoding and JSON serde | [CDNS_MODELS_PLAN.md](docs/plans/CDNS_MODELS_PLAN.md) | In progress (CBOR tests done, JSON serde + improved decoding remaining) |
-| M1.3 | Establish testing patterns and utilities | [TESTING_PLAN.md](docs/plans/TESTING_PLAN.md) | Not started (tests exist for CIP-20/25/27/CDNS but no shared test infrastructure) |
-| M1.4 | Document existing model patterns | [PATTERNS_PLAN.md](docs/plans/PATTERNS_PLAN.md) | Not started |
+| M1.1 | Add comprehensive tests for TUNA models | [TUNA_MODELS_PLAN.md](docs/plans/TUNA_MODELS_PLAN.md) | In progress (constructor validation tests exist; round-trip and golden-vector tests remaining) |
+| M1.2 | Improve CDNS decoding and JSON serde | [CDNS_MODELS_PLAN.md](docs/plans/CDNS_MODELS_PLAN.md) | In progress (CBOR tests and decode validation done; JSON serde remaining) |
+| M1.3 | Establish testing patterns and utilities | [TESTING_PLAN.md](docs/plans/TESTING_PLAN.md) | Not started (per-model tests exist but no shared test infrastructure) |
+| M1.4 | Document existing model patterns | [PATTERNS_PLAN.md](docs/plans/PATTERNS_PLAN.md) | Partial (summarized in CLAUDE.md; full guide not written) |
 
 ### Phase 2: Catalyst & Governance Metadata
 
@@ -67,8 +79,9 @@ Cardano Models serves as the centralized library for Cardano application-layer d
 | Milestone | Description | Plan | Status |
 |-----------|-------------|------|--------|
 | M3.1 | CIP-68 Datum Metadata Standard | [CIP68_PLAN.md](docs/plans/CIP68_PLAN.md) | Not started |
-| M3.2 | CIP-60 Music Token Metadata | [CIP60_PLAN.md](docs/plans/CIP60_PLAN.md) | Not started |
-| M3.3 | CIP-83 Encrypted Messages | [CIP83_PLAN.md](docs/plans/CIP83_PLAN.md) | Not started |
+| M3.2 | CIP-60 Music Token Metadata | (plan removed) | **Complete** (#275) |
+| M3.3 | CIP-83 Encrypted Messages | (plan removed) | **Complete** (#276) |
+| M3.4 | CIP-88 Token Policy Registration | None yet (#225) | Not started |
 
 ### Phase 4: DeFi & Application Datums
 
@@ -93,20 +106,21 @@ Cardano Models serves as the centralized library for Cardano application-layer d
 
 ## Implementation Priority
 
-### High Priority (Address Open Issues)
+### High Priority
 1. **CIP-36** (#4) - Catalyst/Voltaire critical for governance
-2. **CIP-83** (#6) - Encrypted messaging for privacy
-3. **TUNA tests** (#30) - Ensure existing code quality
+2. **TUNA tests** (#30) - Ensure existing code quality
 
 ### Medium Priority (Community Standards)
-4. **CIP-68** - Widely adopted datum metadata standard
-5. **CIP-15** (#3) - Legacy Catalyst support
-6. **CIP-60** (#5) - Music industry adoption
-7. **CDNS improvements** (#108, #13)
+3. **CIP-68** (#210) - Widely adopted datum metadata standard
+4. **CIP-15** (#3) - Legacy Catalyst support
+5. **CDNS JSON serde** (#108)
+6. **CIP-88** (#225) - Token policy registration
+7. **CIP-25 CBOR fixtures** (#259)
 
 ### Lower Priority (Future Standards)
-8. **DeFi datums** - As protocols stabilize
-9. **Redeemer patterns** - Documentation and utilities
+8. **Shared test utilities and pattern docs** (M1.3, M1.4)
+9. **DeFi datums** - As protocols stabilize
+10. **Redeemer patterns** - Documentation and utilities
 
 ---
 
@@ -139,29 +153,14 @@ Cardano Models serves as the centralized library for Cardano application-layer d
 
 ---
 
-### In-Progress Branches
-
-The following local branches contain unmerged work:
-
-| Branch | Description |
-|--------|-------------|
-| `build/makefile` | Make targets for formatting and tests |
-| `fix/prealloc` | Prealloc fix in tuna for golangci-lint |
-| `fix/remove-copy-var` | Remove variable copying |
-| `test/field-alignment` | Optimize field alignment in test struct |
-
-Note: The `feat/cip25` branch is stale (CIP-25 is already on main).
-
----
-
 ## Dependencies
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| gouroboros | v0.153.1 | Ledger types, CBOR utilities |
-| cbor/v2 | v2.9.0 | CBOR encoding/decoding |
-| validator/v10 | v10.30.1 | Struct validation |
-| testify | v1.11.1 | Testing assertions |
+| gouroboros | v0.216.2 | Ledger types, CBOR utilities |
+| cbor/v2 | v2.10.0 | CBOR encoding/decoding |
+| validator/v10 | v10.30.5 | Struct validation |
+| testify | v1.12.1 | Testing assertions |
 
 ---
 
@@ -183,7 +182,7 @@ Note: The `feat/cip25` branch is stale (CIP-25 is already on main).
 When adding new models:
 
 1. Check if a CIP exists for the format
-2. Create a plan document in `plans/` first
+2. Create a plan document in `docs/plans/` first
 3. Follow existing patterns (see [PATTERNS_PLAN.md](docs/plans/PATTERNS_PLAN.md))
 4. Include comprehensive tests with real-world data
 5. Support both CBOR and JSON where applicable
