@@ -228,7 +228,8 @@ func cip83SplitLines(s string) []string {
 
 func cip83Pkcs7Pad(data []byte, blockSize int) []byte {
 	padLen := blockSize - len(data)%blockSize
-	padByte := byte(padLen) //nolint:gosec // padLen is bounded by blockSize (16)
+	// padLen is bounded by blockSize (16)
+	padByte := byte(padLen) //nolint:gosec
 	padded := append([]byte{}, data...)
 	padded = append(padded, bytes.Repeat([]byte{padByte}, padLen)...)
 	return padded

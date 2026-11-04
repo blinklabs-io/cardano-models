@@ -64,7 +64,7 @@ type MusicNum721 struct {
 	// are byte strings. It governs CBOR/JSON key encoding below, so it
 	// must not be left to per-key hex sniffing (see MarshalCBOR).
 	Version  int                                          `json:"version,omitempty" cbor:"version,omitempty" validate:"omitempty,min=1,max=2"`
-	Policies map[HexBytes]map[HexBytes]MusicAssetMetadata `json:"-" cbor:"" validate:"required,min=1,dive,dive"`
+	Policies map[HexBytes]map[HexBytes]MusicAssetMetadata `json:"-"                 cbor:""                  validate:"required,min=1,dive,dive"`
 }
 
 // UnmarshalJSON handles unmarshaling the MusicNum721 structure.
@@ -303,7 +303,7 @@ type MusicAssetMetadata struct {
 // are expected here when ReleaseType is "Album/EP", and in each song
 // otherwise.
 type ReleaseDetails struct {
-	ReleaseType     string `json:"release_type"              cbor:"release_type"              validate:"required,oneof=Single Multiple Album/EP"`
+	ReleaseType     string `json:"release_type"               cbor:"release_type"               validate:"required,oneof=Single Multiple Album/EP"`
 	ReleaseTitle    string `json:"release_title"              cbor:"release_title"              validate:"required"`
 	Distributor     string `json:"distributor,omitempty"      cbor:"distributor,omitempty"`
 	VisualArtist    string `json:"visual_artist,omitempty"    cbor:"visual_artist,omitempty"`

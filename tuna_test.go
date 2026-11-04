@@ -36,12 +36,14 @@ func TestTunaV1State_DecodeConstructorValidation(t *testing.T) {
 	require.Equal(t, valid, decoded)
 
 	for _, tag := range []uint{1, 2} {
-		bad, err := cbor.Encode(cbor.NewConstructorEncoder(tag, cbor.IndefLengthList{
-			valid.BlockNumber, valid.CurrentHash, valid.LeadingZeros,
-			valid.DifficultyNumber, valid.EpochTime, valid.RealTimeNow,
-			valid.Extra,
-			cbor.IndefLengthList{[]byte{7}},
-		}))
+		bad, err := cbor.Encode(
+			cbor.NewConstructorEncoder(tag, cbor.IndefLengthList{
+				valid.BlockNumber, valid.CurrentHash, valid.LeadingZeros,
+				valid.DifficultyNumber, valid.EpochTime, valid.RealTimeNow,
+				valid.Extra,
+				cbor.IndefLengthList{[]byte{7}},
+			}),
+		)
 		require.NoError(t, err)
 		want := models.TunaV1State{
 			BlockNumber: 99, CurrentHash: []byte{98}, LeadingZeros: 97,
@@ -53,7 +55,9 @@ func TestTunaV1State_DecodeConstructorValidation(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, want, got)
 	}
-	bad, err := cbor.Encode(cbor.NewConstructorEncoder(0, cbor.IndefLengthList{}))
+	bad, err := cbor.Encode(
+		cbor.NewConstructorEncoder(0, cbor.IndefLengthList{}),
+	)
 	require.NoError(t, err)
 	want := models.TunaV1State{BlockNumber: 99, CurrentHash: []byte{98}}
 	got := want
@@ -76,11 +80,13 @@ func TestTunaV2State_DecodeConstructorValidation(t *testing.T) {
 	require.Equal(t, valid, decoded)
 
 	for _, tag := range []uint{1, 2} {
-		bad, err := cbor.Encode(cbor.NewConstructorEncoder(tag, cbor.IndefLengthList{
-			valid.BlockNumber, valid.CurrentHash, valid.LeadingZeros,
-			valid.DifficultyNumber, valid.EpochTime, valid.CurrentPosixTime,
-			valid.MerkleRoot,
-		}))
+		bad, err := cbor.Encode(
+			cbor.NewConstructorEncoder(tag, cbor.IndefLengthList{
+				valid.BlockNumber, valid.CurrentHash, valid.LeadingZeros,
+				valid.DifficultyNumber, valid.EpochTime, valid.CurrentPosixTime,
+				valid.MerkleRoot,
+			}),
+		)
 		require.NoError(t, err)
 		want := models.TunaV2State{
 			BlockNumber: 99, CurrentHash: []byte{98}, LeadingZeros: 97,
@@ -92,7 +98,9 @@ func TestTunaV2State_DecodeConstructorValidation(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, want, got)
 	}
-	bad, err := cbor.Encode(cbor.NewConstructorEncoder(0, cbor.IndefLengthList{}))
+	bad, err := cbor.Encode(
+		cbor.NewConstructorEncoder(0, cbor.IndefLengthList{}),
+	)
 	require.NoError(t, err)
 	want := models.TunaV2State{BlockNumber: 99, CurrentHash: []byte{98}}
 	got := want
