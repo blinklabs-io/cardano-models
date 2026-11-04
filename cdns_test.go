@@ -279,7 +279,12 @@ func TestCardanoDnsDomain_DecodeValidation(t *testing.T) {
 	none := cbor.NewConstructorEncoder(1, []any{})
 	validRecord := cbor.NewConstructorEncoder(
 		1,
-		[]any{[]byte("example.cardano"), none, []byte("A"), []byte("192.0.2.1")},
+		[]any{
+			[]byte("example.cardano"),
+			none,
+			[]byte("A"),
+			[]byte("192.0.2.1"),
+		},
 	)
 	domain := func(records any) cbor.ConstructorEncoder {
 		return cbor.NewConstructorEncoder(
@@ -350,8 +355,10 @@ func TestCardanoDnsDomain_DecodeValidation(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			original := models.CardanoDnsDomain{
-				Origin:  []byte("unchanged"),
-				Records: []models.CardanoDnsDomainRecord{{Lhs: []byte("unchanged")}},
+				Origin: []byte("unchanged"),
+				Records: []models.CardanoDnsDomainRecord{
+					{Lhs: []byte("unchanged")},
+				},
 			}
 			got := original
 			_, err := cbor.Decode(testDef.data, &got)

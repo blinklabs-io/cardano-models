@@ -326,7 +326,9 @@ func TestCip25Metadata_Version2_CBOR_RawByteFixture(t *testing.T) {
 	var metadata Cip25Metadata
 	require.NoError(t, cbor.Unmarshal(fixture, &metadata))
 	require.Equal(t, 2, metadata.Num721.Version)
-	policyID := HexBytes("000102030405060708090a0b0c0d0e0f101112131415161718191a1b")
+	policyID := HexBytes(
+		"000102030405060708090a0b0c0d0e0f101112131415161718191a1b",
+	)
 	policy, ok := metadata.Num721.Policies[policyID]
 	require.True(t, ok, "fixture policy byte key should decode to hex")
 	asset, ok := policy[HexBytes("0a0b0c")]
@@ -775,6 +777,10 @@ func TestCip25Metadata_Version1Vs2Keys(t *testing.T) {
 		require.True(t, ok)
 		assetKey := cbor.ByteString("asset1")
 		_, ok = policyMap[assetKey]
-		require.True(t, ok, "version 2 asset key should be the expected byte string")
+		require.True(
+			t,
+			ok,
+			"version 2 asset key should be the expected byte string",
+		)
 	})
 }

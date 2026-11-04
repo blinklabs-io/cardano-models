@@ -42,15 +42,20 @@ func singleRelease() MusicAssetMetadata {
 				MediaType: "audio/wav",
 				Src:       UriField{Uris: []string{"ipfs://song"}},
 				Song: SongDetails{
-					SongTitle:    DescField{Descriptions: []string{"Let's Turn it On"}},
+					SongTitle: DescField{
+						Descriptions: []string{"Let's Turn it On"},
+					},
 					SongDuration: "PT3M21S",
 					TrackNumber:  1,
 					CommonMusicDetails: CommonMusicDetails{
 						Artists: []ArtistDetails{
 							{Name: "Sick City", Isni: "xxxxxxxxxxxxx"},
 						},
-						Genres:    []string{"Rock", "Classic Rock"},
-						Copyright: &CopyrightDetails{Master: "1985 Sony", Composition: "1985 Marvin Gaye"},
+						Genres: []string{"Rock", "Classic Rock"},
+						Copyright: &CopyrightDetails{
+							Master:      "1985 Sony",
+							Composition: "1985 Marvin Gaye",
+						},
 					},
 				},
 			},
@@ -67,9 +72,18 @@ func albumRelease() MusicAssetMetadata {
 			ReleaseType:  "Album/EP",
 			ReleaseTitle: "Zipline From Outerspace",
 			CommonMusicDetails: CommonMusicDetails{
-				Artists:   []ArtistDetails{{Name: "Refraktal", Isni: "0000000517483974"}},
-				Genres:    []string{"Electronic", "Experimental", "Psychedelic"},
-				Copyright: &CopyrightDetails{Master: "2024 Refraktal", Composition: "2024 Refraktal"},
+				Artists: []ArtistDetails{
+					{Name: "Refraktal", Isni: "0000000517483974"},
+				},
+				Genres: []string{
+					"Electronic",
+					"Experimental",
+					"Psychedelic",
+				},
+				Copyright: &CopyrightDetails{
+					Master:      "2024 Refraktal",
+					Composition: "2024 Refraktal",
+				},
 			},
 		},
 		Files: []MusicFileDetails{
@@ -126,7 +140,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.MusicMetadataVersion = 0
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "MusicMetadataVersion")
@@ -136,7 +152,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Release.ReleaseType = "Box Set"
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "ReleaseType")
@@ -146,7 +164,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "Files")
@@ -156,7 +176,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files[0].Song.Artists = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "song.artists")
@@ -166,7 +188,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files[0].Song.Genres = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "song.genres")
@@ -176,7 +200,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files[0].Song.Copyright = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "song.copyright")
@@ -186,7 +212,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := albumRelease()
 		asset.Release.Artists = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "release.artists")
@@ -196,7 +224,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := albumRelease()
 		asset.Release.Genres = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "release.genres")
@@ -206,7 +236,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := albumRelease()
 		asset.Release.Copyright = nil
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "release.copyright")
@@ -216,7 +248,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files[0].Song.Genres = []string{"Rock", "Pop", "Jazz", "Blues"}
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "Genres")
@@ -226,7 +260,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files[0].Song.SongDuration = "three minutes"
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "SongDuration")
@@ -236,7 +272,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Files[0].Song.SongTitle = DescField{}
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "song.song_title")
@@ -246,7 +284,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := singleRelease()
 		asset.Release.Artists = []ArtistDetails{{Name: "Someone"}}
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "release must not set")
@@ -256,7 +296,9 @@ func TestNewCip60Metadata_ValidationFailures(t *testing.T) {
 		asset := albumRelease()
 		asset.Files[0].Song.Genres = []string{"Electronic"}
 		_, err := NewCip60Metadata(
-			map[string]map[string]MusicAssetMetadata{"policy1": {"asset1": asset}},
+			map[string]map[string]MusicAssetMetadata{
+				"policy1": {"asset1": asset},
+			},
 		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "song must not set")
@@ -339,7 +381,11 @@ func TestCip60Metadata_CBOR_RoundTrip(t *testing.T) {
 	asset := unmarshaled.Num721.Policies[HexBytes("policy1")][HexBytes("asset1")]
 	require.Equal(t, "Single", asset.Release.ReleaseType)
 	require.Equal(t, "Mr. Bad Guy", asset.Release.ReleaseTitle)
-	require.Equal(t, []string{"Rock", "Classic Rock"}, asset.Files[0].Song.Genres)
+	require.Equal(
+		t,
+		[]string{"Rock", "Classic Rock"},
+		asset.Files[0].Song.Genres,
+	)
 }
 
 // TestCip60Metadata_CBOR_TextKeysByDefault asserts that, under the default

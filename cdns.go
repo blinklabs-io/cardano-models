@@ -206,7 +206,10 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 	switch tmpConstr.Tag() {
 	case 0:
 		if len(fields) != 1 {
-			return fmt.Errorf("expected one field for Some, got %d", len(fields))
+			return fmt.Errorf(
+				"expected one field for Some, got %d",
+				len(fields),
+			)
 		}
 		type tCardanoDnsMaybe CardanoDnsMaybe[T]
 		var tmpCardanoDnsMaybe tCardanoDnsMaybe
@@ -217,7 +220,10 @@ func (c *CardanoDnsMaybe[T]) UnmarshalCBOR(data []byte) error {
 		c.hasValue = true
 	case 1:
 		if len(fields) != 0 {
-			return fmt.Errorf("expected no fields for None, got %d", len(fields))
+			return fmt.Errorf(
+				"expected no fields for None, got %d",
+				len(fields),
+			)
 		}
 		*c = CardanoDnsMaybe[T]{}
 	default:
