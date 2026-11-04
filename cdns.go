@@ -66,13 +66,10 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 	if err := tmpData.DecodeFields(&tmpCardanoDnsDomain); err != nil {
 		return fmt.Errorf("decode CardanoDnsDomain fields: %w", err)
 	}
-	var records []CardanoDnsDomainRecord
-	if tmpCardanoDnsDomain.Records != nil {
-		records = make(
-			[]CardanoDnsDomainRecord,
-			len(tmpCardanoDnsDomain.Records),
-		)
-	}
+	records := make(
+		[]CardanoDnsDomainRecord,
+		len(tmpCardanoDnsDomain.Records),
+	)
 	for idx, recordData := range tmpCardanoDnsDomain.Records {
 		if _, err := cbor.DecodeExact(recordData, &records[idx]); err != nil {
 			return fmt.Errorf(
@@ -81,6 +78,9 @@ func (c *CardanoDnsDomain) UnmarshalCBOR(cborData []byte) error {
 				err,
 			)
 		}
+	}
+	if tmpCardanoDnsDomain.Records == nil {
+		records = nil
 	}
 	*c = CardanoDnsDomain{
 		Origin:         tmpCardanoDnsDomain.Origin,
