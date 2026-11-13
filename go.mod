@@ -5,15 +5,15 @@ go 1.26.10
 require (
 	github.com/blinklabs-io/gouroboros v0.216.2
 	github.com/fxamacker/cbor/v2 v2.10.0
-	github.com/go-playground/validator/v10 v10.30.5
+	github.com/go-playground/validator/v10 v10.30.6
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/crypto v0.58.0
 )
 
 require (
-	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.16 // indirect
+	github.com/go-playground/locales v0.14.2 // indirect
+	github.com/go-playground/universal-translator v0.18.2 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
