@@ -254,8 +254,11 @@ func TestCardanoDnsMaybe_DecodeValidation(t *testing.T) {
 		"Some with two fields":       encode(t, 0, []any{1, 2}),
 		"Some with wrong value type": encode(t, 0, []any{"wrong"}),
 		"None with a field":          encode(t, 1, []any{1}),
-		"Some with non-array fields": encode(t, 0, nil),
-		"None with non-array fields": encode(t, 1, nil),
+		// The constructor encoder writes nil fields as an empty list, so a
+		// non-list field value has to be spelled out as raw CBOR: tag 121 or
+		// 122 followed by an unsigned integer.
+		"Some with non-array fields": {0xd8, 0x79, 0x01},
+		"None with non-array fields": {0xd8, 0x7a, 0x01},
 	} {
 		t.Run(name, func(t *testing.T) {
 			got := models.NewCardanoDnsMaybe[models.CardanoDnsTtl](
